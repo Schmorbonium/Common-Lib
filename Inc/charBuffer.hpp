@@ -1,4 +1,6 @@
-#include "stm32f1xx_hal.h"
+#include "hal.h"
+#include "main.h"
+
 class CharBuffer {
 private:
     static const uint16_t NODE_SIZE = 16;

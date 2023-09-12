@@ -1,5 +1,5 @@
 #include "charBuffer.hpp"
-#include "stm32f1xx_it.h"
+#include "main.h"
 
 class BufferedUart
 {
@@ -11,6 +11,8 @@ private:
     UART_HandleTypeDef* uart;
     void startSending();
     void stopSending();
+    bool pendingReadInterrupt();
+    bool pendingWriteInterrupt();
 public:
     BufferedUart(UART_HandleTypeDef* Core);
     virtual void uartHandler();

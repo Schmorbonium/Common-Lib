@@ -1,4 +1,5 @@
-#include "stm32f1xx_hal.h"
+#include "hal.h"
+#include "main.h"
 
 class GPIO
 {
