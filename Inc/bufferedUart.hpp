@@ -1,5 +1,5 @@
+#include "zHal.h"
 #include "charBuffer.hpp"
-#include "main.h"
 
 class BufferedUart
 {

@@ -33,46 +33,33 @@ void BufferedUart::takeFromInbox(uint8_t *buf, uint16_t count)
     
 }
 
-#ifdef __BLUE_PILL
-const uint16_t TX_Ready = (1 << 7);
-const uint16_t TX_Complete = (1 << 6);
-const uint16_t RX_Ready = (1 << 5);
-const uint16_t TXEIE_Flag = (1 << 7);
-const uint16_t RXNEIE_flag = (1 << 5);
 void BufferedUart::startSending()
 {
-    uart->Instance->CR1 |= TXEIE_Flag;
+    _ZHAL_UART_SET_TXI(uart->Instance);
     sending = true;
 }
 void BufferedUart::stopSending()
 {
-    uart->Instance->CR1 &= (~TXEIE_Flag);
+    _ZHAL_UART_RESET_TXI(uart->Instance);
     sending = false;
 }
 void BufferedUart::startListening()
 {
-    uart->Instance->CR1 |= RXNEIE_flag;
+    _ZHAL_UART_SET_RXI(uart->Instance);
     listening = true;
 }
 void BufferedUart::stopListening()
 {
-    uart->Instance->CR1 &= (~RXNEIE_flag);
+    _ZHAL_UART_RESET_RXI(uart->Instance);
     listening = false;
-}
-bool BufferedUart::pendingReadInterrupt(){
-    return (uart->Instance->SR & TX_Ready);
-}
-bool BufferedUart::pendingWriteInterrupt(){
-    return (uart->Instance->SR & RX_Ready);
-
 }
 void BufferedUart::uartHandler()
 {
-    if (pendingWriteInterrupt())
+    if (_ZHAL_UART_TX_READY(uart->Instance))
     {
         if (TxQue.getSize() > 0)
         {
-            uart->Instance->DR = TxQue.pop();
+            _ZHAL_UART_TX_BYTE(uart->Instance,TxQue.pop());
         }
         if (sending && TxQue.getSize() == 0)
         {
@@ -80,67 +67,9 @@ void BufferedUart::uartHandler()
         }
     }
 
-    while (pendingReadInterrupt())
+    while (_ZHAL_UART_RX_READY(uart->Instance))
     {
-        uint8_t data = (uint8_t)uart->Instance->DR;
+        uint8_t data = _ZHAL_UART_RX_BYTE(uart->Instance);
         RxQue.append(data);
     }
 }
-
-#endif
-
-#ifdef __DISCO
-const uint16_t TX_Ready = (1 << 7);
-const uint16_t TX_Complete = (1 << 6);
-const uint16_t RX_Ready = (1 << 5);
-const uint16_t TXEIE_Flag = (1 << 7);
-const uint16_t RXNEIE_flag = (1 << 5);
-void BufferedUart::startSending()
-{
-    uart->Instance->CR1 |= TXEIE_Flag;
-    sending = true;
-}
-void BufferedUart::stopSending()
-{
-    uart->Instance->CR1 &= (~TXEIE_Flag);
-    sending = false;
-}
-void BufferedUart::startListening()
-{
-    uart->Instance->CR1 |= RXNEIE_flag;
-    listening = true;
-}
-void BufferedUart::stopListening()
-{
-    uart->Instance->CR1 &= (~RXNEIE_flag);
-    listening = false;
-}
-bool BufferedUart::pendingReadInterrupt(){
-    return (uart->Instance->ISR & TX_Ready);
-}
-bool BufferedUart::pendingWriteInterrupt(){
-    return (uart->Instance->ISR & RX_Ready);
-
-}
-void BufferedUart::uartHandler()
-{
-    if (pendingWriteInterrupt())
-    {
-        if (TxQue.getSize() > 0)
-        {
-            uart->Instance->TDR = TxQue.pop();
-        }
-        if (sending && TxQue.getSize() == 0)
-        {
-            stopSending();
-        }
-    }
-
-    while (pendingReadInterrupt())
-    {
-        uint8_t data = (uint8_t)uart->Instance->RDR;
-        RxQue.append(data);
-    }
-}
-
-#endif
