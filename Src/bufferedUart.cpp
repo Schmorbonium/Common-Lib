@@ -62,6 +62,8 @@ void BufferedUart::send(uint8_t *buf, uint16_t length)
     }
 }
 
+
+
 uint16_t BufferedUart::getInputSize()
 {
     return RxQue.getSize();
