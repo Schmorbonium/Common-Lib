@@ -24,7 +24,7 @@
 
 #define _ZHAL_UART_SET_TXI(uartHandle) __ZHAL_SET(uartHandle->CR1, (1 << 7))
 #define _ZHAL_UART_RESET_TXI(uartHandle) __ZHAL_RESET(uartHandle->CR1, (1 << 7))
-#define _ZHAL_UART_SET_RXI(uartHandle) __ZHAL_RESET(uartHandle->CR1, (1 << 5))
+#define _ZHAL_UART_SET_RXI(uartHandle) __ZHAL_SET(uartHandle->CR1, (1 << 5))
 #define _ZHAL_UART_RESET_RXI(uartHandle) __ZHAL_RESET(uartHandle->CR1,(1 << 5))
 
 #define _ZHAL_UART_RX_READY(uartHandle) (uartHandle->SR & (1 << 5))

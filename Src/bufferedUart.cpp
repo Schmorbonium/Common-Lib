@@ -19,6 +19,7 @@ uint16_t BufferedUart::getInputSize()
 {
     return RxQue.getSize();
 }
+
 uint16_t BufferedUart::getOutputSize()
 {
     return TxQue.getSize();
@@ -55,6 +56,16 @@ void BufferedUart::stopListening()
 }
 void BufferedUart::uartHandler()
 {
+    while (_ZHAL_UART_RX_READY(uart->Instance))
+    {
+        // volatile int test =0;
+        // while(test<100){
+        //     test++;
+        // }
+        uint8_t data = _ZHAL_UART_RX_BYTE(uart->Instance);
+        RxQue.append(data);
+    }
+
     if (_ZHAL_UART_TX_READY(uart->Instance))
     {
         if (TxQue.getSize() > 0)
@@ -65,11 +76,5 @@ void BufferedUart::uartHandler()
         {
             stopSending();
         }
-    }
-
-    while (_ZHAL_UART_RX_READY(uart->Instance))
-    {
-        uint8_t data = _ZHAL_UART_RX_BYTE(uart->Instance);
-        RxQue.append(data);
     }
 }
