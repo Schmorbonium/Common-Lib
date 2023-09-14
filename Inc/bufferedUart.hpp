@@ -7,7 +7,7 @@
 
 class BufferedUart
 {
-private:
+protected:
     bool listening;
     bool sending;
     CharBuffer TxQue;

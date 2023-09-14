@@ -38,6 +38,7 @@ uint8_t CharBuffer::pop()
     __disable_irq();
     if (size == 0)
     {
+        return 0;
         // throw std::out_of_range("Buffer is empty");
     }
 
@@ -58,11 +59,13 @@ uint8_t CharBuffer::pop()
     __enable_irq();
     return value;
 }
+
 // Peaks at a value at given index. Warning! This i O(index)
 uint8_t CharBuffer::peak(uint16_t index) const
 {
     if (index + 1 > size)
     {
+        return 0;
     }
     uint16_t relIndex = index + headIndex;
     Node *curNode = head;
