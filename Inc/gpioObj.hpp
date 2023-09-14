@@ -1,3 +1,7 @@
+
+#ifndef __GPIO__
+#define __GPIO__
+
 #include "zHal.h"
 
 class GPIO
@@ -14,3 +18,5 @@ class GPIO
     uint16_t pin;
     bool on;
 };
+
+#endif // End __GPIO__

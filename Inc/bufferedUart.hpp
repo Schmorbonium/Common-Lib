@@ -1,3 +1,7 @@
+#ifndef __BUFFERED_UART__
+#define __BUFFERED_UART__
+
+
 #include "zHal.h"
 #include "charBuffer.hpp"
 
@@ -23,3 +27,6 @@ public:
     uint16_t getInputSize();
     uint16_t getOutputSize();
 };
+
+
+#endif // End __BUFFERED_UART__

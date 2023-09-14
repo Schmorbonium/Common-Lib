@@ -1,3 +1,10 @@
+#ifndef __Z_HAL__
+#define __Z_HAL__
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // Disco
 #define __ZHAL_SET(reg,mask) reg |= mask
 #define __ZHAL_RESET(reg,mask) reg &= (~mask)
@@ -41,3 +48,8 @@
 
 #endif 
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __Z_HAL__ */

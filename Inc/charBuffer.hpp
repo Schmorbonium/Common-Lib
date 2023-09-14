@@ -1,3 +1,8 @@
+#ifndef __CHAR_BUFFER__
+#define __CHAR_BUFFER__
+
+
+
 #include "zHal.h"
 
 class CharBuffer {
@@ -38,3 +43,6 @@ public:
     // Print the contents of the buffer
     void print() const;
 };
+
+
+#endif // End __CHAR_BUFFER__
