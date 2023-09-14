@@ -1,9 +1,13 @@
+#ifndef __BUFFERED_UART__
+#define __BUFFERED_UART__
+
+
 #include "zHal.h"
 #include "charBuffer.hpp"
 
 class BufferedUart
 {
-private:
+protected:
     bool listening;
     bool sending;
     CharBuffer TxQue;
@@ -23,3 +27,6 @@ public:
     uint16_t getInputSize();
     uint16_t getOutputSize();
 };
+
+
+#endif // End __BUFFERED_UART__
