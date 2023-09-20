@@ -15,7 +15,7 @@ IbcPacket::IbcPacket(CharBuffer* buf) {
     this->len = IBCP_LEN(header);
     this->id = IBCP_ID(header);
     this->data = new uint8_t[this->len];
-    for (int i = 0; i < this->len; i++) {
+    for (int i = this->len-1; i >= 0; i--) {
         this->data[i] = buf->pop();
     }
 }

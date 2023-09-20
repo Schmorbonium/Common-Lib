@@ -16,7 +16,8 @@ bool IbcHandler::hasCompletePacket() {
 
     // buffer does not have all the data bytes that belong to this header
     uint8_t byte1 = this->RxQue.peak(1);
-    if (this->RxQue.getSize() < (byte1 & IbcPacket::lengthMask) + 2) {
+    uint8_t pkt_len = (byte1 & IbcPacket::lengthMask) >> 5;
+    if (this->RxQue.getSize() < (pkt_len + 2)) {
         return false;
     }
 
