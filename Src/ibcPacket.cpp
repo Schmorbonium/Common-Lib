@@ -15,8 +15,8 @@ IbcPacket::IbcPacket(CharBuffer* buf) {
     this->len = IBCP_LEN(header);
     this->id = IBCP_ID(header);
     this->data = new uint8_t[this->len];
-    for (int i = this->len-1; i >= 0; i--) {
-        this->data[i] = buf->pop();
+    for (int i = len - 1; i >= 0; i--) {
+        (this->data)[i] = buf->pop();
     }
 }
 
@@ -30,7 +30,7 @@ void IbcPacket::queueInto(CharBuffer* buf) {
     buf->append((header & 0xFF00) >> 8);
     buf->append(header & 0xFF);
     // queue every byte of data
-    for (int i = 0; i < this->len; i++) {
+    for (int i = len-1; i >= 0; i--) {
         buf->append(this->data[i]);
     }
 }

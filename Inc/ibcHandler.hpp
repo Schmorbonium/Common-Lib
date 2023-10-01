@@ -8,7 +8,7 @@
 
 class IbcHandler : public BufferedUart {
 public:
-    IbcPacket stagedPacket;
+    IbcPacket* stagedPacket;
     IbcPacketCallback callback;
     uint8_t attnMask;
     IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, uint8_t attnMask);

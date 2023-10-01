@@ -21,9 +21,9 @@ public:
     uint8_t id;
     uint8_t* data;
     const static uint8_t lengthMask = 0xE0;
-    IbcPacket():data(new uint8_t[1]){}
+    IbcPacket():attn(0), ttl(0), len(0), id(0), data(new uint8_t[1]){}
     IbcPacket(CharBuffer* buf);
-    ~IbcPacket();
+    virtual ~IbcPacket();
     void queueInto(CharBuffer* buf);
     virtual bool process() {return false;}
 
