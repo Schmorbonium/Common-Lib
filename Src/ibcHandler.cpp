@@ -6,7 +6,7 @@ IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, u
     BufferedUart(huart),
     callback(_callback),
     attnMask(attnMask) {
-        this->stagedPacket = 0;
+    this->stagedPacket = 0;
 }
 
 bool IbcHandler::hasCompletePacket() {

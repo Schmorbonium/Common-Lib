@@ -3,7 +3,7 @@
 #define IBCP_ATTN(header) ((header & 0xF000) >> 12)
 #define IBCP_TTL(header) ((header & 0x0300) >> 8)
 #define IBCP_LEN(header) ((header & 0x00E0) >> 5)
-#define IBCP_ID(header) ((header & 0x001F) >> 0)
+#define IBCP_ID(header) ((IBCID)((header & 0x001F) >> 0))
 
 #define IBCP_PKT(attn, ttl, len, id) (((attn & 0xF) << 12) | ((ttl & 0x3) << 8) | ((len & 0x7) << 5)  | ((id & 0x1F) << 0))
 
