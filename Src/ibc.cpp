@@ -15,6 +15,10 @@ void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, uint8_t attn
     handler->startListening();
 }
 
+void sendIbcPacket(uint8_t attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
+    handler->sendPacket((IBCATTN)attn, ttl, len, id, data);
+}
+
 uint32_t unpackData(uint8_t len, uint8_t* data) {
     switch (len) {
     case 1:

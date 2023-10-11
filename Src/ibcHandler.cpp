@@ -40,3 +40,9 @@ void IbcHandler::processStagedPacket() {
         this->startSending();
     }
 }
+
+void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data){
+    IbcPacket p = IbcPacket(attn, ttl, len, id, data);
+    p.queueInto(&TxQue);
+    startSending();
+}

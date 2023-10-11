@@ -51,12 +51,20 @@ typedef enum {
     IBCID_GETFLAGS = 0x14
 } IBCID;
 
+typedef enum {
+    IBCATTN_MEMIO = 0x1,
+    IBCATTN_CONT = 0x2,
+    IBCATTN_ALU = 0x4,
+    IBCATTN_REGFILE = 0x8
+} IBCATTN;
+
     typedef void (*IbcPacketCallback)(IBCID, uint8_t, uint8_t*);
     void processIbcInbox();
     void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, uint8_t attnMask);
     void usartIbcHandler();
     // len must be 1, 2, or 4 bytes
     uint32_t unpackData(uint8_t len, uint8_t* data);
+    void sendIbcPacket(uint8_t attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data);
 
 #ifdef __cplusplus
 }
