@@ -24,7 +24,7 @@ MaxSpiHandler::MaxSpiHandler(SPI_HandleTypeDef* hspi, uint8_t numOfDigits, uint8
     csPin(csPin) {
 
     turnOff();
-    setReg(REG_SCAN_LIMIT, numOfDigits);
+    setReg(REG_SCAN_LIMIT, numOfDigits-1);
     setReg(REG_DECODE_MODE, 0x00);
     setReg(REG_DISPLAY_TEST, 0x00);
     setIntensity(intensity);
@@ -33,7 +33,7 @@ MaxSpiHandler::MaxSpiHandler(SPI_HandleTypeDef* hspi, uint8_t numOfDigits, uint8
 }
 
 void MaxSpiHandler::clearDisplay() {
-    for (int i = 1; i < 0; i++){
+    for (int i = 1; i < 9; i++){
         setReg(i, MAX7219_SYM_BLANK);
     }
 }
