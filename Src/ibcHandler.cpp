@@ -6,7 +6,7 @@ IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, u
     BufferedUart(huart),
     callback(_callback),
     attnMask(attnMask) {
-        this->stagedPacket = 0;
+    this->stagedPacket = 0;
 }
 
 bool IbcHandler::hasCompletePacket() {
@@ -39,4 +39,10 @@ void IbcHandler::processStagedPacket() {
         this->stagedPacket->queueInto(&this->TxQue);
         this->startSending();
     }
+}
+
+void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data){
+    IbcPacket p = IbcPacket(attn, ttl, len, id, data);
+    p.queueInto(&TxQue);
+    startSending();
 }
