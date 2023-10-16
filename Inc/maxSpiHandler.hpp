@@ -65,6 +65,10 @@ public:
     void turnOff();
     void setIntensity(uint8_t intensity);
     void setReg(uint8_t addr, uint8_t data);
+    void setDispHex(uint32_t value);
+    int setDispDec(uint32_t value);
+    int setDispStr(char* buf);
+    uint8_t char2Symbol(char c);
 };
 
 #endif
