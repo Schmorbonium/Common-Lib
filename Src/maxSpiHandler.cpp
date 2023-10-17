@@ -64,7 +64,7 @@ void MaxSpiHandler::setReg(uint8_t addr, uint8_t data) {
 
 void MaxSpiHandler::setDispHex(uint32_t value) {
     char buf[9];
-    sprintf(buf, "%x", value);
+    sprintf(buf, "%lx", value);
     setDispStr(buf);
 }
 
