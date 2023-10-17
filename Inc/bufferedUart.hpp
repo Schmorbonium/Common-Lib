@@ -19,6 +19,7 @@ protected:
     bool pendingWriteInterrupt();
 public:
     BufferedUart(UART_HandleTypeDef* Core);
+    ~BufferedUart(){}
     virtual void uartHandler();
     void startListening();
     void stopListening();
