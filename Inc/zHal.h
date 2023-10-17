@@ -42,6 +42,7 @@ extern "C" {
 
 #endif 
 
+// BluePill
 #ifdef STM32F103xB
 #include "stm32f1xx_hal.h"
 
