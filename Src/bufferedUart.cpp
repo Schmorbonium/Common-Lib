@@ -58,10 +58,6 @@ void BufferedUart::uartHandler()
 {
     while (_ZHAL_UART_RX_READY(uart->Instance))
     {
-        // volatile int test =0;
-        // while(test<100){
-        //     test++;
-        // }
         uint8_t data = _ZHAL_UART_RX_BYTE(uart->Instance);
         RxQue.append(data);
     }

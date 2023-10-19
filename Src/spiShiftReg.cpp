@@ -4,7 +4,7 @@
 void SpiShiftReg_Core::latchData()
 {
     HAL_GPIO_WritePin(latchGpio, latchPin, GPIO_PIN_SET);
-    HAL_Delay(1);
+    // HAL_Delay(1);
     HAL_GPIO_WritePin(latchGpio, latchPin, GPIO_PIN_RESET);
 }
 
