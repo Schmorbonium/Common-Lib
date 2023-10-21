@@ -4,7 +4,7 @@
 #include "zHal.h"
 
 #define LCD_W 320
-#define LCD_H 240
+#define LCD_H 480
 
 #define NO_OP 0x00
 #define SW_RST 0x01
@@ -22,6 +22,15 @@
 #define DIS_ON 0x29
 
 #define COLOR_LUT_SET 0x2D
+#define SET_PIXEL_FORMAT 0x3A
+#define SET_SPI_CONF 0xB0
+#define SLEEP_OUT 0x11
+
+#define MADCTL_CMD 0x36
+#define Dir_MADCTL_0DEG 0X88
+#define Dir_MADCTL_90DEG 0xE8
+#define Dir_MADCTL_180DEG 0x48
+#define Dir_MADCTL_270DEG 0x28
 
 enum LCD_Dir
 {
@@ -30,6 +39,13 @@ enum LCD_Dir
     down,
     left
 };
+
+typedef struct
+{
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
+} Color;
 class LCD_Controller
 {
 private:
@@ -66,7 +82,7 @@ private:
         HAL_GPIO_WritePin(chipSel_GPIO, chipSel_pin, GPIO_PIN_SET);
     }
 
-    void writeDataToLcd(uint16_t dataLen, uint8_t* dataLSB)
+    void writeDataToLcd(uint32_t dataLen, uint8_t *dataLSB)
     {
         HAL_GPIO_WritePin(chipSel_GPIO, chipSel_pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DataComSel_GPIO, DataComSel_pin, GPIO_PIN_SET); // Signals that data being written
@@ -75,25 +91,30 @@ private:
         HAL_GPIO_WritePin(chipSel_GPIO, chipSel_pin, GPIO_PIN_SET);
     }
 
-    void writeColorDataToLcd(uint16_t dataLen, uint16_t color)
+    void writeColorDataToLcd(uint32_t dataLen, Color color)
     {
         HAL_GPIO_WritePin(chipSel_GPIO, chipSel_pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DataComSel_GPIO, DataComSel_pin, GPIO_PIN_SET); // Signals that data being written
-        uint8_t MSB = (uint8_t)(color>>8);
-        uint8_t LSB = (uint8_t)(color&0xff);
-        
-        for (uint16_t i = 0; i < dataLen; i++)
+
+        uint8_t data[] = {color.R, color.G, color.B};
+
+        for (uint32_t i = 0; i < dataLen; i++)
         {
-            HAL_SPI_Transmit(Spi, &MSB, 1, 0);
-            HAL_SPI_Transmit(Spi, &LSB, 1, 0);
+            HAL_SPI_Transmit(Spi, data, 3, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &G, 1, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &B, 1, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &MSB, 1, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &MSB, 1, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &MSB, 1, HAL_MAX_DELAY);
+            // HAL_SPI_Transmit(Spi, &LSB, 1, HAL_MAX_DELAY);
         }
         HAL_GPIO_WritePin(chipSel_GPIO, chipSel_pin, GPIO_PIN_SET);
     }
 
-    void writeCmdToLcd(uint8_t cmd, uint16_t dataLen, uint8_t *data)
+    void writeCmdToLcd(uint32_t cmd, uint32_t dataLen, uint8_t *data)
     {
         writeCmdToLcd(cmd);
-        for (uint16_t i = 0; i < dataLen; i++)
+        for (uint32_t i = 0; i < dataLen; i++)
         {
             writeDataToLcd(data[i]);
         }
@@ -117,7 +138,7 @@ private:
     {
         uint16_t xEnd = x + w;
         uint8_t xdata[4] = {(uint8_t)(x >> 8), (uint8_t)(0xFF & x), (uint8_t)(xEnd >> 8), (uint8_t)(xEnd & 0xff)};
-        writeCmdToLcd(ROW_RANGE_SET, 4, (uint8_t *)&xdata);
+        writeCmdToLcd(COL_RANGE_SET, 4, (uint8_t *)&xdata);
         // LCD_WR_REG(ROW_RANGE_SET);
         // LCD_WR_DATA(x >> 8);
         // LCD_WR_DATA(0x00FF & x);
@@ -139,15 +160,29 @@ private:
         writeCmdToLcd(MEM_SET, len, data);
     }
 
-    void WriteMemSingleCol(uint16_t len, uint16_t color)
+    void WriteMemSingleCol(uint32_t len, Color color)
     {
         writeCmdToLcd(MEM_SET);
-        writeColorDataToLcd(len,color);
+        writeColorDataToLcd(len, color);
     }
 
     void SWReset()
     {
-        writeCmdToLcd(SW_RST);
+        // writeCmdToLcd(SW_RST);
+        writeCmdToLcd(SET_PIXEL_FORMAT);
+        writeDataToLcd(0x66); // RGB666
+
+        writeCmdToLcd(SET_SPI_CONF);
+        writeDataToLcd(0x80); // disable MISO pin
+
+        writeCmdToLcd(SET_SPI_CONF); // Why twice, Dont know
+        writeDataToLcd(0x80);        // disable MISO pin
+
+        writeCmdToLcd(SLEEP_OUT);
+        HAL_Delay(120);
+
+        writeCmdToLcd(DIS_ON);
+        // HAL_Delay(5);
         HAL_Delay(120);
         // writeCmdToLcd(0xCF);  // Power Control B
         // writeDataToLcd(0x00); //
@@ -239,8 +274,8 @@ private:
         // writeDataToLcd(0x00);
         // writeDataToLcd(0xef);
         // writeCmdToLcd(0x11); // Exit Sleep
-        HAL_Delay(120);
-        writeCmdToLcd(0x29); // display on
+        // HAL_Delay(120);
+        // writeCmdToLcd(0x29); // display on
     }
 
     void DisOn()
@@ -264,22 +299,22 @@ public:
         case up:
             xSize = LCD_W;
             ySize = LCD_H;
-            writeCmdToLcd(0x36, (1 << 3) | (0 << 6) | (0 << 7)); // BGR==1,MY==0,MX==0,MV==0
+            writeCmdToLcd(MADCTL_CMD, Dir_MADCTL_0DEG); // BGR==1,MY==0,MX==0,MV==0
             break;
         case right:
             xSize = LCD_H;
             ySize = LCD_W;
-            writeCmdToLcd(0x36, (1 << 3) | (0 << 7) | (1 << 6) | (1 << 5)); // BGR==1,MY==1,MX==0,MV==1
+            writeCmdToLcd(MADCTL_CMD, Dir_MADCTL_90DEG); // BGR==1,MY==1,MX==0,MV==1
             break;
         case down:
             xSize = LCD_W;
             ySize = LCD_H;
-            writeCmdToLcd(0x36, (1 << 3) | (1 << 6) | (1 << 7)); // BGR==1,MY==0,MX==0,MV==0
+            writeCmdToLcd(MADCTL_CMD, Dir_MADCTL_180DEG); // BGR==1,MY==0,MX==0,MV==0
             break;
         case left:
             xSize = LCD_H;
             ySize = LCD_W;
-            writeCmdToLcd(0x36, (1 << 3) | (1 << 7) | (1 << 5)); // BGR==1,MY==1,MX==0,MV==1
+            writeCmdToLcd(MADCTL_CMD, Dir_MADCTL_270DEG); // BGR==1,MY==1,MX==0,MV==1
             break;
         default:
             break;
@@ -312,6 +347,7 @@ public:
         HWReset();
         SWReset();
         BackLightEnable();
+        LCD_Dir(down);
     }
 
     void BackLightEnable()
@@ -336,10 +372,14 @@ public:
     //     HAL_GPIO_WritePin(LcdBackLed_GPIO, LcdBackLed_pin, GPIO_PIN_RESET);
     // }
 
-    void drawRec(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
+    void drawRec(uint16_t x, uint16_t y, uint16_t w, uint16_t h, Color color)
     {
         SetWindow(x, y, w, h);
         WriteMemSingleCol(w * h, color);
+    }
+    void clearFrame(Color color)
+    {
+        drawRec(0, 0, xSize, ySize, color);
     }
 };
 
