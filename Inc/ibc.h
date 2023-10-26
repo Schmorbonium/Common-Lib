@@ -58,6 +58,19 @@ typedef enum {
     IBCATTN_REGFILE = 0x8
 } IBCATTN;
 
+typedef enum {
+    IBC_ALUOP_ADD = 0x0,
+    IBC_ALUOP_SLL = 0x1,
+    IBC_ALUOP_SLT = 0x2,
+    IBC_ALUOP_SLTU = 0x3,
+    IBC_ALUOP_XOR = 0x4,
+    IBC_ALUOP_SRL = 0x5,
+    IBC_ALUOP_OR = 0x6,
+    IBC_ALUOP_AND = 0x7,
+    IBC_ALUOP_SUB = 0x8,
+    IBC_ALUOP_SRA = 0x9
+} IBC_ALUOP;
+
     typedef void (*IbcPacketCallback)(IBCID, uint8_t, uint8_t*);
     void processIbcInbox();
     void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, uint8_t attnMask);
