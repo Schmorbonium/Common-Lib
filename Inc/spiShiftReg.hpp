@@ -1,4 +1,8 @@
+#ifndef __SPI_SHIFT_REG_H
+#define __SPI_SHIFT_REG_H
+
 #include "zHal.h"
+
 class SpiShiftReg_Core
 {
     SPI_HandleTypeDef *ledSpi;
@@ -55,12 +59,12 @@ public:
 // Note there should be a dedicated Timer to run MultiFrameShiftReg, this is so an active frame rate can be maintained
 class MultiFrameSiftReg : public SpiShiftReg_Core
 {
-    uint16_t *data;
     uint8_t frameDepth;
     uint8_t currentFrame;
     uint16_t *pwmVals;
 
 protected:
+    uint16_t *data;
     uint16_t *framePointer(uint8_t frame);
     void refreshDisplay();
     void advanceFrame();
@@ -78,3 +82,5 @@ public:
     void setBrightness(uint8_t frame, uint8_t newValue);
     virtual void DrawTick();
 };
+
+#endif
