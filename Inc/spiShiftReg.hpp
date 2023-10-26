@@ -35,9 +35,9 @@ public:
 
 class DirectSpiShiftReg : public SpiShiftReg_Core
 {
-    uint16_t *data;
 
 protected:
+    uint16_t *data;
     void refreshDisplay();
 
 public:
