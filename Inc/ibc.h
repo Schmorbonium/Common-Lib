@@ -30,18 +30,26 @@ typedef enum {
     // 0b XXXE
     // - [0] E: Memory write enable
     IBCID_C2MFLAGS = 0x0A,
+
     // Controller to Regfile flags (len 2)
     // 0bDDDD DBBB BBAA AAAE
     // - [15:11] D: Register Select Destination
     // - [10:6] B: Register Select B
     // - [5:1] A: Register Select A
     // - [0] E: Register Write Enable
+
+    // - [??] register destination MUX (aluQ, pc+4, memData, imm)
     IBCID_C2RFLAGS = 0x0B,
+
     // Controller to ALU flags
+    // 0b PP PPAB
     // - alu op
-    // - alu src a
-    // - alu src b
+    // - alu src a [rs1/pc]
+    // - alu src b [rs2/imm]
     IBCID_C2AFLAGS = 0x0C,
+
+    IBCID_CYCLEDONE = 0x0E,
+    IBCID_CLKRISINGEDGE = 0x0F,
 
     // Isaac's requests
     IBCID_SETREG = 0x10,
