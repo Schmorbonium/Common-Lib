@@ -23,7 +23,7 @@ typedef enum {
     // MEMory WRite DATa
     IBCID_MEMWRDAT = 0x07,
     // MEMory ReaD DATa
-    ICBID_MEMRDDAT = 0x08,
+    IBCID_MEMRDDAT = 0x08,
     // INSTruction DATa
     IBCID_INSTDAT = 0x09,
     // Controller to Memory flags (len 1)
@@ -32,13 +32,12 @@ typedef enum {
     IBCID_C2MFLAGS = 0x0A,
 
     // Controller to Regfile flags (len 2)
-    // 0bDDDD DBBB BBAA AAAE
-    // - [15:11] D: Register Select Destination
-    // - [10:6] B: Register Select B
-    // - [5:1] A: Register Select A
+    // 0b0SSD DDDB BBBA AAAE
+    // - [14:13] S: register destination MUX (aluQ, pc+4, memData, imm)
+    // - [12:9] D: Register Select Destination
+    // - [8:5] B: Register Select B
+    // - [4:1] A: Register Select A
     // - [0] E: Register Write Enable
-
-    // - [??] register destination MUX (aluQ, pc+4, memData, imm)
     IBCID_C2RFLAGS = 0x0B,
 
     // Controller to ALU flags
