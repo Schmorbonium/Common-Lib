@@ -80,8 +80,9 @@ typedef enum {
 } IBC_ALUOP;
 
     typedef void (*IbcPacketCallback)(IBCID, uint8_t, uint8_t*);
+    typedef void (*IbcResetCallback)(void);
     void processIbcInbox();
-    void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, uint8_t attnMask);
+    void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, IbcResetCallback resetCallback, uint8_t attnMask);
     void usartIbcHandler();
     // len must be 1, 2, or 4 bytes
     uint32_t unpackData(uint8_t len, uint8_t* data);
