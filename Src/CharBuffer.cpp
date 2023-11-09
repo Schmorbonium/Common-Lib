@@ -120,3 +120,44 @@ void CharBuffer::print() const
         current = current->next;
     }
 }
+
+void CharBuffer::append_uint16(uint16_t c){
+    this->append(c && 0xFF);
+    this->append((c >> 8 )&& 0xFF);
+}
+
+void CharBuffer::append_uint32(uint32_t c){
+    this->append(c         && 0xFF);
+    this->append((c >> 8 ) && 0xFF);
+    this->append((c >> 16 )&& 0xFF);
+    this->append((c >> 24 )&& 0xFF);
+    
+}
+
+uint16_t CharBuffer::pop_uint16(){
+    uint16_t d = this->pop();
+    d |= this->pop() << 8;
+    return d;
+}
+
+uint32_t CharBuffer::pop_uint32(){
+    uint32_t d = this->pop();
+    d |= this->pop() << 8;
+    d |= this->pop() << 16;
+    d |= this->pop() << 24;
+    return d;
+}
+
+uint16_t CharBuffer::peak_uint16() const {
+    uint16_t d = this->peak(0);
+    d |= this->peak(1) << 8;
+    return d;
+}
+
+uint32_t CharBuffer::peak_uint32() const {
+    uint32_t d = this->peak(0);
+    d |= this->peak(1) << 8;
+    d |= this->peak(2) << 16;
+    d |= this->peak(3) << 24;
+    return d;
+}
