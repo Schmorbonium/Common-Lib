@@ -13,6 +13,13 @@ IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, I
     this->syncResetCallback = _resetCallback;
     this->asyncResetCallback = setResetFlag;
     this->resetCountLimit = 8;
+    sendResetVector();
+}
+
+void IbcHandler::sendResetVector() {
+    for (int i = 0; i < resetCountLimit; i++) {
+        TxQue.append(0);
+    }
 }
 
 void setResetFlag() {
@@ -21,7 +28,7 @@ void setResetFlag() {
 
 bool IbcHandler::hasCompletePacket() {
     // special reset pkt case
-    if(resetFlag) {
+    if (resetFlag) {
         syncResetCallback();
         resetFlag = 0;
     }

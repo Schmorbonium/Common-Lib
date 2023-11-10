@@ -16,7 +16,7 @@ public:
     bool hasCompletePacket();
     void processStagedPacket();
     void sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data);
-
+    void sendResetVector();
 };
 
 #endif
