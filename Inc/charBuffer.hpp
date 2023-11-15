@@ -43,6 +43,7 @@ public:
     // Peaks at the value at a given index
     uint8_t peak(uint16_t) const;
 
+    uint16_t peak_uint16(uint16_t) const; 
     uint16_t peak_uint16() const;
     uint32_t peak_uint32() const;
 

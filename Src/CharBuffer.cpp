@@ -154,6 +154,12 @@ uint16_t CharBuffer::peak_uint16() const {
     return d;
 }
 
+uint16_t CharBuffer::peak_uint16(uint16_t startingIndex) const {
+    uint16_t d = this->peak(startingIndex);
+    d |= this->peak(startingIndex + 1) << 8;
+    return d;
+}
+
 uint32_t CharBuffer::peak_uint32() const {
     uint32_t d = this->peak(0);
     d |= this->peak(1) << 8;
