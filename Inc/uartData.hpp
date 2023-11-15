@@ -18,23 +18,25 @@ public:
     PacketField() {}
     virtual void parseFromQue(CharBuffer *que) {}
     virtual void appendToQue(CharBuffer *que) {}
+    virtual uint16_t getWireSize() {return 0;}
 };
 
 class Uint8Field : public PacketField
 {
 public:
     uint8_t data;
-    Uint8Field(uint8_t data) : PacketField(), data(data) {}
+    Uint8Field(uint8_t data) : data(data) {}
     Uint8Field(CharBuffer *que) { parseFromQue(que); }
     virtual void parseFromQue(CharBuffer *que) { data = que->pop(); }
     virtual void appendToQue(CharBuffer *que) { que->append(data); }
+    virtual uint16_t getWireSize() {return 1;}
 };
 
 class Uint16Field : public PacketField
 {
 public:
     uint16_t data;
-    Uint16Field(uint16_t data) : PacketField(), data(data) {}
+    Uint16Field(uint16_t data) : data(data) {}
     Uint16Field(CharBuffer *que) { parseFromQue(que); }
     virtual void parseFromQue(CharBuffer *que)
     {
@@ -45,6 +47,7 @@ public:
         que->append_uint16(data);
 
     }
+    virtual uint16_t getWireSize() {return 2;}
 };
 
 class Uint32Field : public PacketField
@@ -52,7 +55,7 @@ class Uint32Field : public PacketField
 protected:
 public:
     uint32_t data;
-    Uint32Field(uint32_t data) : PacketField(), data(data) {}
+    Uint32Field(uint32_t data) : data(data) {}
     Uint32Field(CharBuffer *que) { parseFromQue(que); }
     virtual void parseFromQue(CharBuffer *que)
     {
@@ -62,6 +65,7 @@ public:
     {
         que->append_uint32(data);
     }
+    virtual uint16_t getWireSize() {return 4;}
 };
 
 class UnusedField8 : public PacketField
@@ -69,7 +73,7 @@ class UnusedField8 : public PacketField
 protected:
 public:
     UnusedField8() {}
-    UnusedField8(CharBuffer *que) {}
+    UnusedField8(CharBuffer *que) {que->pop();}
     virtual void parseFromQue(CharBuffer *que)
     {
         que->pop();
@@ -78,6 +82,7 @@ public:
     {
         que->append(0);
     }
+    virtual uint16_t getWireSize() {return 1;}
 };
 
 // ------------------------ Complex fields ----------------------------------
@@ -88,7 +93,7 @@ protected:
     char *string;
 
 public:
-    StringField(char *string, uint16_t strLeng) : len(strLeng)
+    StringField(char *string, uint16_t strLeng) :len(strLeng)
     {
         string = new char[len.data];
         for (uint16_t i = 0; i < len.data; i++)
@@ -99,6 +104,7 @@ public:
 
     StringField(CharBuffer *que) : len(que)
     {
+        string = new char[len.data];
         for (uint16_t i = 0; i < len.data; i++)
         {
             string[i] = que->pop();
@@ -113,6 +119,7 @@ public:
     virtual void parseFromQue(CharBuffer *que)
     {
         len = Uint16Field(que);
+        string = new char[len.data];
         for (uint16_t i = 0; i < len.data; i++)
         {
             string[i] = que->pop();
@@ -127,6 +134,7 @@ public:
             que->append(string[i]);
         }
     }
+    virtual uint16_t getWireSize() {return len.getWireSize() + len.data*2;}
 };
 
 class Uint8ArrayFeild : public PacketField
@@ -174,6 +182,7 @@ public:
             que->append(data[i]);
         }
     }
+    virtual uint16_t getWireSize() {return len.getWireSize() + len.data*1;}
 };
 
 class Uint16ArrayFeild : public PacketField
@@ -221,17 +230,18 @@ public:
             que->append_uint16(data[i]);
         }
     }
+    virtual uint16_t getWireSize() {return len.getWireSize() + len.data*2;}
 };
 
 class Uint32ArrayFeild : public PacketField
 {
 protected:
     Uint16Field len;
-    uint16_t *data;
+    uint32_t *data;
 public:
-    Uint32ArrayFeild(uint16_t *_data, uint16_t _len) : len(_len)
+    Uint32ArrayFeild(uint32_t *_data, uint16_t _len) : len(_len)
     {
-        data = new uint16_t[len.data];
+        data = new uint32_t[len.data];
         for (uint16_t i = 0; i < len.data; i++)
         {
             this->data[i] = _data[i];
@@ -239,7 +249,7 @@ public:
     }
     Uint32ArrayFeild(CharBuffer *que) : len(que)
     {
-        data = new uint16_t[len.data];
+        data = new uint32_t[len.data];
         for (uint16_t i = 0; i < len.data; i++)
         {
             data[i] = que->pop_uint32();
@@ -253,7 +263,7 @@ public:
     {
         delete[] data;
         len = Uint16Field(que);
-        data = new uint16_t[len.data];
+        data = new uint32_t[len.data];
 
         for (uint16_t i = 0; i < len.data; i++)
         {
@@ -268,6 +278,7 @@ public:
             que->append_uint32(data[i]);
         }
     }
+    virtual uint16_t getWireSize() {return len.getWireSize() + len.data*4;}
 };
 
 class FlagField : public Uint8Field

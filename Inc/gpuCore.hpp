@@ -38,7 +38,7 @@ enum Command : uint16_t
     Cmd_LoadLut
 };
 
-class GPU_CHannel : BufferedUart
+class GPU_CHannel : protected BufferedUart
 {
     GPU_CHannel(UART_HandleTypeDef *Core) : BufferedUart(Core)
     {
@@ -48,160 +48,230 @@ class GPU_CHannel : BufferedUart
     {
         return (Command)this->RxQue.peak_uint16();
     }
+
+    bool PacketReady()
+    {
+        if(RxQue.getSize()>4){
+            return false;
+        }
+        uint16_t packetSize = this->RxQue.peak_uint16(2);
+        if(RxQue.getSize() >= packetSize){
+            return true;
+        }
+    }
+
+    GPU_Packet* getNextPacket(){
+        return new GPU_Packet(&this->RxQue);
+    }
+
+    void SendPacket(GPU_Packet* packetToSend){
+        packetToSend->appendToQue(&this->TxQue);
+    }
 };
 
-class GpuHeader : PacketField
+class GpuHeader : public PacketField
 {
 public:
     Uint16Field command;
-    GpuHeader(uint16_t data) : PacketField(), command(data) {}
+    GpuHeader(Command data) : command(data) {}
     GpuHeader(CharBuffer *que) : command(que) {}
-    virtual void parseFromQue(CharBuffer *que) { command.parseFromQue(que); }
-    virtual void appendToQue(CharBuffer *que) { command.appendToQue(que); }
+    virtual void parseFromQue(CharBuffer *que)
+    {
+        command.parseFromQue(que);
+    }
+    virtual void appendToQue(CharBuffer *que)
+    {
+        command.appendToQue(que);
+    }
+    virtual uint16_t getWireSize() { return command.getWireSize(); }
+};
+class GPU_Packet : public PacketField
+{
+public:
+    GpuHeader command;
+    Uint16Field length;
+    PacketField *payload;
+    GPU_Packet(Command data, PacketField *payload)
+        : command(data),
+          length((uint16_t)0),
+          payload(payload)
+    {
+        length.data = command.getWireSize() + length.getWireSize() + payload->getWireSize();
+    }
+    GPU_Packet(CharBuffer *que) : command(que), length(que) {
+        parsePayload(que);
+    }
+
+    void parsePayload(CharBuffer *que){
+        switch((Command)this->command.command.data)
+        {
+        case Cmd_FrameID:
+            this->payload = new FrameIdPkt(que);
+            break;
+        case Cmd_LutID:
+        case Cmd_SpriteID:
+        case Cmd_ResetGpu:
+        case Cmd_NewFrame:
+        case Cmd_NewLut:
+        case Cmd_NewSprite:
+        case Cmd_LinkFrame:
+        case Cmd_LinkMultiFrame:
+        case Cmd_PlaceSprite:
+        case Cmd_AnimateSprite:
+        case Cmd_MoveSprite:
+        case Cmd_LoadFrame:
+        case Cmd_LoadLut:
+        default:
+            this->payload = new PacketField();
+            break;
+        }
+    }
+
+    virtual void parseFromQue(CharBuffer *que)
+    {
+        command.parseFromQue(que);
+        length.parseFromQue(que);
+    }
+
+    virtual void appendToQue(CharBuffer *que)
+    {
+        command.appendToQue(que);
+        length.appendToQue(que);
+    }
+
+    virtual uint16_t getWireSize()
+    {
+        return command.getWireSize() +
+               length.getWireSize() +
+               payload->getWireSize();
+    }
 };
 
 // Cmd_FrameID = 0x1,
-class FrameIdPkt : PacketField
+// Size 6 Bytes (Header=4 FrameId=2)
+class FrameIdPkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field FrameId;
-    FrameIdPkt(uint16_t _FrameId) : header((uint16_t)Cmd_FrameID), FrameId(_FrameId) {}
-    FrameIdPkt(CharBuffer *que) : header(que), FrameId(que) {}
+    FrameIdPkt(uint16_t _FrameId) : FrameId(_FrameId) {}
+    FrameIdPkt(CharBuffer *que) : FrameId(que) {}
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         FrameId.parseFromQue(que);
     }
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         FrameId.appendToQue(que);
     }
+    virtual uint16_t getWireSize() { return FrameId.getWireSize(); }
 };
 //     Cmd_LutID,
-class LutIdPkt : PacketField
+class LutIdPkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field LutId;
-    LutIdPkt(uint16_t _LutId) : header((uint16_t)Cmd_LutID), LutId(_LutId) {}
-    LutIdPkt(CharBuffer *que) : header(que), LutId(que) {}
+    LutIdPkt(uint16_t _LutId) : LutId(_LutId) {}
+    LutIdPkt(CharBuffer *que) : LutId(que) {}
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         LutId.parseFromQue(que);
     }
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         LutId.appendToQue(que);
     }
+    virtual uint16_t getWireSize() { return LutId.getWireSize(); }
 };
 
 //     Cmd_SpriteID,
-class SpriteIdPkt : PacketField
+class SpriteIdPkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field spriteId;
-    SpriteIdPkt(uint16_t _spriteId) : header((uint16_t)Cmd_SpriteID), spriteId(spriteId) {}
-    SpriteIdPkt(CharBuffer *que) : header(que), spriteId(que) {}
+    SpriteIdPkt(uint16_t _spriteId) : spriteId(spriteId) {}
+    SpriteIdPkt(CharBuffer *que) : spriteId(que) {}
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         spriteId.parseFromQue(que);
     }
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         spriteId.appendToQue(que);
     }
+    virtual uint16_t getWireSize() { return spriteId.getWireSize(); }
 };
 //     Cmd_ResetGpu,
-class ResetGpuPkt : PacketField
+class ResetGpuPkt : public PacketField
 {
 public:
-    GpuHeader header;
-    ResetGpuPkt() : header((uint16_t)Cmd_ResetGpu) {}
-    ResetGpuPkt(CharBuffer *que) : header(que) {}
+    ResetGpuPkt() {}
+    ResetGpuPkt(CharBuffer *que) {}
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
     }
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
     }
 };
 //     Cmd_NewFrame, NEW_FRAME(W,H)
-class NewFramePkt : PacketField
+class NewFramePkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field width;
     Uint16Field height;
-    NewFramePkt(uint16_t _width, uint16_t _height) : header((uint16_t)Cmd_NewFrame), width(_width), height(_height) {}
-    NewFramePkt(CharBuffer *que) : header(que), width(que), height(que) {}
+    NewFramePkt(uint16_t _width, uint16_t _height) : width(_width), height(_height) {}
+    NewFramePkt(CharBuffer *que) : width(que), height(que) {}
 
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         width.parseFromQue(que);
         height.parseFromQue(que);
     }
 
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         width.appendToQue(que);
         height.appendToQue(que);
     }
 };
 //     Cmd_NewLut,
-class NewLutPkt : PacketField
+class NewLutPkt : public PacketField
 {
 public:
-    GpuHeader header;
-    NewLutPkt() : header((uint16_t)Cmd_NewFrame) {}
-    NewLutPkt(CharBuffer *que) : header(que) {}
+    NewLutPkt() {}
+    NewLutPkt(CharBuffer *que) {}
 
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
     }
 
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
     }
 };
 
 //     Cmd_NewSprite,
 // SPRITE_ID NEW_SPRITE(W,H,FRAME_COUNT) Creates a new SPRITE with given Width Height, and frame depth. (should allow for animation for us nerds)
 
-class NewSpritePkt : PacketField
+class NewSpritePkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field width;
     Uint16Field height;
     Uint16Field frameCnt;
     NewSpritePkt(uint16_t w, uint16_t h, uint16_t d)
-        : header((uint16_t)Cmd_NewFrame),
-          width(w),
+        : width(w),
           height(h),
           frameCnt(d)
     {
     }
     NewSpritePkt(CharBuffer *que)
-        : header(que), width(que), height(que), frameCnt(que)
+        : width(que), height(que), frameCnt(que)
     {
     }
 
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         width.parseFromQue(que);
         height.parseFromQue(que);
         frameCnt.parseFromQue(que);
@@ -209,78 +279,68 @@ public:
 
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         width.appendToQue(que);
         height.appendToQue(que);
         frameCnt.appendToQue(que);
     }
 };
 // Status   LOAD_FRAME(FRAME_ID,frameDate)
-class LoadFramePkt : PacketField
+class LoadFramePkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field frameId;
     Uint8ArrayFeild data;
     LoadFramePkt(uint16_t _frameId, uint16_t _dLen, uint8_t *d)
-        : header((uint16_t)Cmd_NewFrame),
-          frameId(_frameId),
+        : frameId(_frameId),
           data(d, _dLen)
     {
     }
     LoadFramePkt(CharBuffer *que)
-        : header(que),
-          frameId(que),
+        : frameId(que),
           data(que)
     {
     }
 
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         frameId.parseFromQue(que);
     }
 
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         frameId.appendToQue(que);
     }
 };
 // Status   LOAD_LUT(LUT_ID,LUT_Data)
-class LoadLudPkt : PacketField
+class LoadLudPkt : public PacketField
 {
 public:
-    GpuHeader header;
     Uint16Field lutId;
     Uint8ArrayFeild lutData;
     LoadLudPkt(uint16_t _lutId, uint16_t _dLen, uint8_t *d)
-        : header((uint16_t)Cmd_NewFrame),
-          lutId(_lutId),
+        : lutId(_lutId),
           lutData(d, _dLen)
     {
     }
     LoadLudPkt(CharBuffer *que)
-        : header(que),
-          lutId(que),
+        : lutId(que),
           lutData(que)
     {
     }
 
     virtual void parseFromQue(CharBuffer *que)
     {
-        header.parseFromQue(que);
         lutId.parseFromQue(que);
         lutData.parseFromQue(que);
     }
 
     virtual void appendToQue(CharBuffer *que)
     {
-        header.appendToQue(que);
         lutId.appendToQue(que);
         lutData.appendToQue(que);
     }
 };
+
 //     Cmd_LinkFrame,
 //     Cmd_LinkMultiFrame,
 //     Cmd_PlaceSprite,
