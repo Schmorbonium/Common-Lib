@@ -15,19 +15,19 @@ class GPU_Server : public GPU_Channel
     {
         while (!initialized)
         {
-            if (this->RxQue.getSize() > 4)
+            if (ctlUart.getInputSize() > 4)
             {
                 Command cmd = this->peekCommand();
                 if (cmd != Cmd_ResetGpu)
                 {
-                    RxQue.pop();
+                    ctlUart.RxQue.pop();
                     continue;
                 }
 
-                uint16_t cmdLen = RxQue.peak_uint16(2);
-                if (RxQue.getSize() >= cmdLen)
+                uint16_t cmdLen = ctlUart.RxQue.peak_uint16(2);
+                if (ctlUart.RxQue.getSize() >= cmdLen)
                 {
-                    GpuResetPkt resetCommand(&RxQue);
+                    GpuResetPkt resetCommand(&ctlUart.RxQue);
                     resetCommand.actOnPkt();
                 }
             }

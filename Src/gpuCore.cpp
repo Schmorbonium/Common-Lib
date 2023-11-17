@@ -87,31 +87,31 @@ uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
 
 // ------------------------------------- GPU Channel -------------------------------------
-GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : BufferedUart(Core)
+GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : ctlUart(Core)
 {
 }
 
 Command GPU_Channel::peekCommand()
 {
-    return (Command)this->RxQue.peak_uint16();
+    return (Command)ctlUart.RxQue.peak_uint16();
 }
 
 bool GPU_Channel::PacketReady()
 {
-    if (RxQue.getSize() > 4)
+    if (ctlUart.RxQue.getSize() > 4)
     {
         return false;
     }
-    uint16_t packetSize = this->RxQue.peak_uint16(2);
-    return (RxQue.getSize() >= packetSize);
+    uint16_t packetSize = ctlUart.RxQue.peak_uint16(2);
+    return (ctlUart.RxQue.getSize() >= packetSize);
 }
 
 GPU_Packet *GPU_Channel::getNextPacket()
 {
-    return new GPU_Packet(&this->RxQue);
+    return new GPU_Packet(&ctlUart.RxQue);
 }
 
 void GPU_Channel::SendPacket(GPU_Packet *packetToSend)
 {
-    packetToSend->appendToQue(&this->TxQue);
+    this->ctlUart.send(packetToSend);
 }

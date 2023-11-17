@@ -38,50 +38,28 @@ enum Command : uint16_t
     Cmd_ResetGpu = 0xA5A5
 };
 
-class GPU_Packet : public PacketField
+class GPU_Packet : public ISendable, public PacketField
 {
 public:
     Uint16Field pktId;
     Uint16Field pktLen;
-
-    GPU_Packet(Command command) : pktId((uint16_t)command), pktLen((uint16_t)0)
-    {
-    }
-
-    GPU_Packet(CharBuffer *que) : pktId(que), pktLen(que)
-    {
-    }
-
-    virtual bool actOnPkt() {}
-    virtual void appendPayload(CharBuffer *que) {}
-    virtual uint16_t getPayloadWireSize() { return 0; }
-
-    uint16_t getWireSize()
-    {
-        return getHeaderWireSize() + getPayloadWireSize();
-    }
-
-    uint16_t getHeaderWireSize()
-    {
-        return pktId.getWireSize() + pktLen.getWireSize();
-    }
-
-    void appendHeader(CharBuffer *que)
-    {
-        this->pktId.appendToQue(que);
-        this->pktLen.data = this->getWireSize();
-        this->pktLen.appendToQue(que);
-    }
-
-    void appendToQue(CharBuffer *que)
-    {
-        this->appendHeader(que);
-        this->appendPayload(que);
-    }
+    
+    GPU_Packet(Command command);
+    GPU_Packet(CharBuffer *que);
+    virtual bool actOnPkt();
+    virtual void appendPayload(CharBuffer *que);
+    virtual uint16_t getPayloadWireSize();
+    uint16_t getWireSize();
+    uint16_t getHeaderWireSize();
+    void appendHeader(CharBuffer *que);
+    void appendToQue(CharBuffer *que);
 };
 
-class GPU_Channel : protected BufferedUart
+class GPU_Channel
 {
+protected:
+    BufferedUart ctlUart;
+
 public:
     GPU_Channel(UART_HandleTypeDef *Core);
     Command peekCommand();
@@ -245,7 +223,6 @@ public:
     // Implement in client and server
     virtual bool actOnPkt();
 };
-
 
 // Enum to determine what type of reset is requested
 enum ResetType_Enum : uint16_t

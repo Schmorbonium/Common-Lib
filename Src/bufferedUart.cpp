@@ -24,6 +24,15 @@ void BufferedUart::send(uint8_t* buf, uint16_t length) {
     }
 }
 
+void BufferedUart::send(ISendable* sendableObj)
+{
+    sendableObj->appendToQue(&this->TxQue);
+    if (sending == false)
+    {
+        startSending();
+    }
+}
+
 
 uint16_t BufferedUart::getInputSize() {
     return RxQue.getSize();
