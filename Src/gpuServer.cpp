@@ -2,7 +2,7 @@
 #include "gpuServer.hpp"
 
 
-extern GPU_Server* gpu_server;
+extern GPU_Server gpuServer;
 
 
 #ifdef USE_GPU_SERVER
@@ -21,7 +21,7 @@ bool MoveSpritePkt::actOnPkt() {}
 bool LoadFramePkt::actOnPkt() {}
 bool LoadLutPkt::actOnPkt() {}
 bool GpuResetPkt::actOnPkt() {
-    gpu_server->initialized = true;
+    gpuServer.initialized = true;
 }
 #endif
 

@@ -36,6 +36,7 @@ class GPU_Server : public GPU_Channel
 
     void init()
     {
+        this->ctlUart.startListening();
         GpuResetPkt rstPkt(RST_init);
         this->SendPacket(&rstPkt);
         waitOnInit();
