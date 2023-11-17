@@ -18,8 +18,6 @@
 #include "charBuffer.hpp"
 #include "uartData.hpp"
 
-
-
 // ------------------------------------- Core Packet Class -------------------------------------
 GPU_Packet::GPU_Packet(Command command) : pktId((uint16_t)command), pktLen((uint16_t)0)
 {
@@ -29,7 +27,7 @@ GPU_Packet::GPU_Packet(CharBuffer *que) : pktId(que), pktLen(que)
 {
 }
 
-bool GPU_Packet::actOnPkt() {}
+bool GPU_Packet::actOnPkt() { return false;}
 void GPU_Packet::appendPayload(CharBuffer *que) {}
 uint16_t GPU_Packet::getPayloadWireSize() { return 0; }
 
@@ -56,8 +54,6 @@ void GPU_Packet::appendToQue(CharBuffer *que)
     this->appendPayload(que);
 }
 
-
-
 // ------------------------------------- Generic packet stuff -------------------------------------
 // Cmd_FrameID = 0x1,
 FrameIdPkt::FrameIdPkt(uint16_t _FrameId) : GPU_Packet(Cmd_FrameID), FrameId(_FrameId) {}
@@ -77,14 +73,22 @@ uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
 // Cmd_MoveSprite,
 // Cmd_LoadFrame,
 // Cmd_LoadLut,
+FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
+FillBackGroundPkt::FillBackGroundPkt(CharBuffer *que) : GPU_Packet(que), fillColor(que) {}
+void FillBackGroundPkt::appendPayload(CharBuffer *que)
+{
+    fillColor.appendToQue(que);
+}
+uint16_t FillBackGroundPkt::getPayloadWireSize()
+{
+    return fillColor.getWireSize();
+}
 
 // Cmd_ResetGpu = 0xA5A5
 GpuResetPkt::GpuResetPkt(ResetType_Enum ResetType) : GPU_Packet(Cmd_ResetGpu), ResetType(ResetType) {}
 GpuResetPkt::GpuResetPkt(CharBuffer *que) : GPU_Packet(que), ResetType(que) {}
 void GpuResetPkt::appendPayload(CharBuffer *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
-
-
 
 // ------------------------------------- GPU Channel -------------------------------------
 GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : ctlUart(Core)
@@ -105,9 +109,22 @@ bool GPU_Channel::PacketReady()
     uint16_t packetSize = ctlUart.RxQue.peak_uint16(2);
     return (ctlUart.RxQue.getSize() >= packetSize);
 }
+bool GPU_Channel::processNextPacket() {
+    GPU_Packet* pkt = getNextPacket();
+    pkt->actOnPkt();
+    delete pkt;
+}
 
 GPU_Packet *GPU_Channel::getNextPacket()
 {
+    CharBuffer* inputQue = &(this->ctlUart.RxQue);
+    switch (this->peekCommand())
+    {
+    case Cmd_FillBackGround:
+        return new FillBackGroundPkt(inputQue);   
+    default:
+        break;
+    }
     return new GPU_Packet(&ctlUart.RxQue);
 }
 
@@ -116,6 +133,7 @@ void GPU_Channel::SendPacket(GPU_Packet *packetToSend)
     this->ctlUart.send(packetToSend);
 }
 
-void GPU_Channel::UartIRQHandler() {
+void GPU_Channel::UartIRQHandler()
+{
     this->ctlUart.uartHandler();
 }

@@ -22,11 +22,16 @@ bool AnimateSpritePkt::actOnPkt() {return false;}
 bool MoveSpritePkt::actOnPkt() {return false;}
 bool LoadFramePkt::actOnPkt() {return false;}
 bool LoadLutPkt::actOnPkt() {return false;}
+bool FillBackGroundPkt::actOnPkt() {
+    gpu_client.display.clearFrame(this->fillColor.value);
+    return true;
+}
 bool GpuResetPkt::actOnPkt(){
     switch (this->ResetType.data)
     {
     case RST_init:
-        gpu_client.init();
+        // gpu_client.init();
+        gpu_client.markInitalized();
         gpu_client.SendPacket(this);
         /* code */
         break;
@@ -68,6 +73,10 @@ GPU_Client::GPU_Client(UART_HandleTypeDef *Core,
           LcdBackLed_GPIO,
           LcdBackLed_pin)
 {
+}
+
+void GPU_Client::markInitalized(){
+    this->initialized = true;
 }
 
 void GPU_Client::waitOnInit()
@@ -166,6 +175,12 @@ void GPU_Client::testDisplay()
     DisplayObj sch(display, schmorby_assets.Schmorby, 200, 0);
 
     HAL_Delay(100);
+
+    while(1){
+        if(this->PacketReady()){
+            this->processNextPacket();
+        }
+    }
 }
 
 #endif

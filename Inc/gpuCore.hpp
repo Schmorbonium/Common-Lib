@@ -19,6 +19,16 @@
 #include "bufferedUart.hpp"
 #include "charBuffer.hpp"
 #include "uartData.hpp"
+#include "displayShapes.hpp"
+
+typedef uint16_t ShapeID_t;
+typedef uint16_t FrameID_t;
+typedef uint16_t LutID_t;
+typedef uint16_t SpriteID_t;
+typedef uint16_t PosX_t;
+typedef uint16_t PosY_t;
+typedef uint16_t Width_t;
+typedef uint16_t Height_t;
 
 enum Command : uint16_t
 {
@@ -35,6 +45,10 @@ enum Command : uint16_t
     Cmd_MoveSprite,
     Cmd_LoadFrame,
     Cmd_LoadLut,
+    Cmd_FillBackGround,
+    Cmd_NewShape,
+    Cmd_SetShape,
+    Cmd_MoveShape,
     Cmd_ResetGpu = 0xA5A5
 };
 
@@ -46,6 +60,7 @@ public:
 
     GPU_Packet(Command command);
     GPU_Packet(CharBuffer *que);
+    virtual ~GPU_Packet(){};
     virtual bool actOnPkt();
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
@@ -59,12 +74,14 @@ class GPU_Channel
 {
 protected:
     BufferedUart ctlUart;
+
 public:
     GPU_Channel(UART_HandleTypeDef *Core);
     Command peekCommand();
     bool PacketReady();
     GPU_Packet *getNextPacket();
     void SendPacket(GPU_Packet *packetToSend);
+    bool processNextPacket();
     void UartIRQHandler();
 };
 
@@ -73,7 +90,7 @@ class FrameIdPkt : public GPU_Packet
 {
 public:
     Uint16Field FrameId;
-    FrameIdPkt(uint16_t _FrameId);
+    FrameIdPkt(FrameID_t _FrameId);
     FrameIdPkt(CharBuffer *que);
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
@@ -86,7 +103,7 @@ class LutIdPkt : public GPU_Packet
 {
 public:
     Uint16Field LutId;
-    LutIdPkt(uint16_t LutId);
+    LutIdPkt(LutID_t LutId);
     LutIdPkt(CharBuffer *que);
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
@@ -99,7 +116,7 @@ class SpriteIdPkt : public GPU_Packet
 {
 public:
     Uint16Field SpriteId;
-    SpriteIdPkt(uint16_t SpriteId);
+    SpriteIdPkt(SpriteID_t SpriteId);
     SpriteIdPkt(CharBuffer *que);
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
@@ -113,7 +130,7 @@ class NewFramePkt : public GPU_Packet
 public:
     Uint16Field W;
     Uint16Field H;
-    NewFramePkt(uint16_t w, uint16_t h);
+    NewFramePkt(Width_t w, Height_t h);
     NewFramePkt(CharBuffer *que);
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
@@ -216,8 +233,61 @@ public:
 class LoadLutPkt : public GPU_Packet
 {
 public:
-    LoadLutPkt(uint16_t LutId);
+    LoadLutPkt(LutID_t LutId);
     LoadLutPkt(CharBuffer *que);
+    virtual void appendPayload(CharBuffer *que);
+    virtual uint16_t getPayloadWireSize();
+    // Implement in client and server
+    virtual bool actOnPkt();
+};
+// Cmd_FillBackGround
+class FillBackGroundPkt : public GPU_Packet
+{
+public:
+    ColorField fillColor;
+    FillBackGroundPkt(Color color);
+    FillBackGroundPkt(CharBuffer *que);
+    virtual void appendPayload(CharBuffer *que);
+    virtual uint16_t getPayloadWireSize();
+    // Implement in client and server
+    virtual bool actOnPkt();
+};
+// Enum to determine what type of reset is requested
+enum ShapeType_Enum : uint16_t
+{
+    rectangle = 0x1,
+    circle,
+    triangle
+};
+
+// Cmd_NewShape,
+class NewShapePkt : public GPU_Packet
+{
+public:
+    NewShapePkt();
+    NewShapePkt(CharBuffer *que);
+    virtual void appendPayload(CharBuffer *que);
+    virtual uint16_t getPayloadWireSize();
+    // Implement in client and server
+    virtual bool actOnPkt();
+};
+// Cmd_SetShape,
+class SetShapePkt : public GPU_Packet
+{
+public:
+    SetShapePkt(uint16_t ShapeId, ShapeType_Enum shapeType, uint16_t w, uint16_t h);
+    SetShapePkt(CharBuffer *que);
+    virtual void appendPayload(CharBuffer *que);
+    virtual uint16_t getPayloadWireSize();
+    // Implement in client and server
+    virtual bool actOnPkt();
+};
+// Cmd_MoveShape,
+class MoveShapePkt : public GPU_Packet
+{
+public:
+    MoveShapePkt(uint16_t LutId);
+    MoveShapePkt(CharBuffer *que);
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
@@ -231,6 +301,7 @@ enum ResetType_Enum : uint16_t
     RST_full,
     RST_ClearScreen
 };
+
 // Cmd_ResetGpu = 0xA5A5
 class GpuResetPkt : public GPU_Packet
 {

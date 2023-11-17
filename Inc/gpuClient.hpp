@@ -26,6 +26,7 @@ public:
     void init();
     void fullReset();
     void clearScreen();
+    void markInitalized();
 };
 
 #endif
