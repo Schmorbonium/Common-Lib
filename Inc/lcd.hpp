@@ -47,44 +47,6 @@ typedef struct
     uint8_t G;
     uint8_t B;
 } Color;
-
-class LCD_Spi
-{
-    SPI_HandleTypeDef *Spi;
-
-    GPIO_TypeDef *DataComSel_GPIO;
-    uint16_t DataComSel_pin;
-
-    GPIO_TypeDef *chipSel_GPIO;
-    uint16_t chipSel_pin;
-
-    GPIO_TypeDef *LcdRst_GPIO;
-    uint16_t LcdRst_pin;
-
-    GPIO_TypeDef *LcdBackLed_GPIO;
-    uint16_t LcdBackLed_pin;
-
-    LCD_Spi(
-        SPI_HandleTypeDef *Spi,
-        GPIO_TypeDef *DataComSel_GPIO,
-        uint16_t DataComSel_pin,
-        GPIO_TypeDef *chipSel_GPIO,
-        uint16_t chipSel_pin,
-        GPIO_TypeDef *LcdRst_GPIO,
-        uint16_t LcdRst_pin,
-        GPIO_TypeDef *LcdBackLed_GPIO,
-        uint16_t LcdBackLed_pin) : Spi(Spi),
-                                   DataComSel_GPIO(DataComSel_GPIO),
-                                   DataComSel_pin(DataComSel_pin),
-                                   chipSel_GPIO(chipSel_GPIO),
-                                   chipSel_pin(chipSel_pin),
-                                   LcdRst_GPIO(LcdRst_GPIO),
-                                   LcdRst_pin(LcdRst_pin),
-                                   LcdBackLed_GPIO(LcdBackLed_GPIO),
-                                   LcdBackLed_pin(LcdBackLed_pin)
-    {
-    }
-};
 class LCD_Controller
 {
 private:
