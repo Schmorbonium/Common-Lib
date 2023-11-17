@@ -25,16 +25,16 @@ bool GpuResetPkt::actOnPkt()
     switch (this->ResetType.data)
     {
     case RST_init:
-        gpu_client->init();
-        gpu_client->SendPacket(this);
+        gpu_client.init();
+        gpu_client.SendPacket(this);
         /* code */
         break;
     case RST_full:
-        gpu_client->fullReset();
+        gpu_client.fullReset();
         /* code */
         break;
     case RST_ClearScreen:
-        gpu_client->clearScreen();
+        gpu_client.clearScreen();
         /* code */
         break;
     default:
