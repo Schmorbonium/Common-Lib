@@ -1,7 +1,5 @@
 #include "gpuClient.hpp"
 
-#define USE_GPU_CLIENT
-
 extern GPU_Client* gpu_client;
 
 

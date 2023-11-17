@@ -60,7 +60,7 @@ public:
 
     void init()
     {
-        this->initialized = true;
+        waitOnInit();
     }
 
     void fullReset()
