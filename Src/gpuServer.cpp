@@ -1,7 +1,7 @@
 #include "gpuCore.hpp"
 #include "gpuServer.hpp"
 
-#define USE_GPU_SERVER
+
 extern GPU_Server* gpu_server;
 
 
