@@ -1,3 +1,6 @@
+#ifdef USE_GPU_CLIENT
+
+
 #include "gpuClient.hpp"
 #include "lcd.hpp"
 #include "schmorby_assets.h"
@@ -5,7 +8,6 @@
 
 extern GPU_Client gpu_client;
 
-#ifdef USE_GPU_CLIENT
 // All of the Thing that must be Implemented on the client and server Side
 bool FrameIdPkt::actOnPkt() {return false;}
 bool LutIdPkt::actOnPkt() {return false;}
@@ -42,7 +44,6 @@ bool GpuResetPkt::actOnPkt(){
     return true;
 }
 
-#endif
 
 GPU_Client::GPU_Client(UART_HandleTypeDef *Core,
                        SPI_HandleTypeDef *Spi,
@@ -166,3 +167,5 @@ void GPU_Client::testDisplay()
 
     HAL_Delay(100);
 }
+
+#endif
