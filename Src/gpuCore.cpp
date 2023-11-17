@@ -115,3 +115,7 @@ void GPU_Channel::SendPacket(GPU_Packet *packetToSend)
 {
     this->ctlUart.send(packetToSend);
 }
+
+void GPU_Channel::UartIRQHandler() {
+    this->ctlUart.uartHandler();
+}

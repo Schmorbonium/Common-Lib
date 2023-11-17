@@ -43,7 +43,7 @@ class GPU_Packet : public ISendable, public PacketField
 public:
     Uint16Field pktId;
     Uint16Field pktLen;
-    
+
     GPU_Packet(Command command);
     GPU_Packet(CharBuffer *que);
     virtual bool actOnPkt();
@@ -59,13 +59,13 @@ class GPU_Channel
 {
 protected:
     BufferedUart ctlUart;
-
 public:
     GPU_Channel(UART_HandleTypeDef *Core);
     Command peekCommand();
     bool PacketReady();
     GPU_Packet *getNextPacket();
     void SendPacket(GPU_Packet *packetToSend);
+    void UartIRQHandler();
 };
 
 // Cmd_FrameID = 0x1,
