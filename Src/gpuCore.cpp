@@ -102,7 +102,7 @@ Command GPU_Channel::peekCommand()
 
 bool GPU_Channel::PacketReady()
 {
-    if (ctlUart.RxQue.getSize() > 4)
+    if (ctlUart.RxQue.getSize() < 4)
     {
         return false;
     }
@@ -113,6 +113,7 @@ bool GPU_Channel::processNextPacket() {
     GPU_Packet* pkt = getNextPacket();
     pkt->actOnPkt();
     delete pkt;
+    return true;
 }
 
 GPU_Packet *GPU_Channel::getNextPacket()

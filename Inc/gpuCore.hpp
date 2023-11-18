@@ -247,6 +247,7 @@ public:
     ColorField fillColor;
     FillBackGroundPkt(Color color);
     FillBackGroundPkt(CharBuffer *que);
+    ~FillBackGroundPkt(){}
     virtual void appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
