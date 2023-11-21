@@ -49,6 +49,11 @@ class GPU_Server : public GPU_Channel
     void clearScreen()
     {
     }
+
+    void setBackgroundColor(Color color){
+        FillBackGroundPkt commandPkt(color);
+        this->SendPacket(&commandPkt);
+    }
 };
 
 #endif
