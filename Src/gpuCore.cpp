@@ -58,6 +58,7 @@ void GPU_Packet::appendToQue(CharBuffer *que)
 // Cmd_FrameID = 0x1,
 FrameIdPkt::FrameIdPkt(uint16_t _FrameId) : GPU_Packet(Cmd_FrameID), FrameId(_FrameId) {}
 FrameIdPkt::FrameIdPkt(CharBuffer *que) : GPU_Packet(que), FrameId(que) {}
+FrameIdPkt::~FrameIdPkt(){}
 void FrameIdPkt::appendPayload(CharBuffer *que) { FrameId.appendToQue(que); }
 uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
 
@@ -75,6 +76,7 @@ uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
 // Cmd_LoadLut,
 FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
 FillBackGroundPkt::FillBackGroundPkt(CharBuffer *que) : GPU_Packet(que), fillColor(que) {}
+FillBackGroundPkt::~FillBackGroundPkt(){}
 void FillBackGroundPkt::appendPayload(CharBuffer *que)
 {
     fillColor.appendToQue(que);
@@ -87,6 +89,7 @@ uint16_t FillBackGroundPkt::getPayloadWireSize()
 // Cmd_ResetGpu = 0xA5A5
 GpuResetPkt::GpuResetPkt(ResetType_Enum ResetType) : GPU_Packet(Cmd_ResetGpu), ResetType(ResetType) {}
 GpuResetPkt::GpuResetPkt(CharBuffer *que) : GPU_Packet(que), ResetType(que) {}
+GpuResetPkt::~GpuResetPkt(){}
 void GpuResetPkt::appendPayload(CharBuffer *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
