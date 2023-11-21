@@ -25,5 +25,13 @@ bool GpuResetPkt::actOnPkt() {
     gpuServer.initialized = true;
     return true;
 }
+
+// Implement in client and server
+// Implement in client and server
+// Implement in client and server
+bool NewShapePkt::actOnPkt(){}
+bool SetShapePkt::actOnPkt();
+bool MoveShapePkt::actOnPkt();
+
 #endif
 

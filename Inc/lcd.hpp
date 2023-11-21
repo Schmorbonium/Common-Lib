@@ -126,12 +126,10 @@ class ColorField : public ISendable
 public:
     Color value;
     // Uint8Field r,g,b;
-
     ColorField(Color color);
-    
     ColorField(CharBuffer *que);
-    uint16_t getWireSize();
     virtual void appendToQue(CharBuffer *que);
+    virtual uint16_t getWireSize();
     Color getColor();
 };
 

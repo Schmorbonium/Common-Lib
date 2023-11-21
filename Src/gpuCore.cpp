@@ -27,7 +27,7 @@ GPU_Packet::GPU_Packet(CharBuffer *que) : pktId(que), pktLen(que)
 {
 }
 
-bool GPU_Packet::actOnPkt() { return false;}
+bool GPU_Packet::actOnPkt() { return false; }
 void GPU_Packet::appendPayload(CharBuffer *que) {}
 uint16_t GPU_Packet::getPayloadWireSize() { return 0; }
 
@@ -58,7 +58,7 @@ void GPU_Packet::appendToQue(CharBuffer *que)
 // Cmd_FrameID = 0x1,
 FrameIdPkt::FrameIdPkt(uint16_t _FrameId) : GPU_Packet(Cmd_FrameID), FrameId(_FrameId) {}
 FrameIdPkt::FrameIdPkt(CharBuffer *que) : GPU_Packet(que), FrameId(que) {}
-FrameIdPkt::~FrameIdPkt(){}
+FrameIdPkt::~FrameIdPkt() {}
 void FrameIdPkt::appendPayload(CharBuffer *que) { FrameId.appendToQue(que); }
 uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
 
@@ -74,9 +74,38 @@ uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
 // Cmd_MoveSprite,
 // Cmd_LoadFrame,
 // Cmd_LoadLut,
+// Cmd_NewShape,
+NewShapePkt::NewShapePkt(ShapeObj shapeData)
+    : GPU_Packet(Cmd_NewShape),
+      shapeData(shapeData) {}
+NewShapePkt::NewShapePkt(CharBuffer *que)
+    : GPU_Packet(que),
+      shapeData(que) {}
+NewShapePkt::~NewShapePkt() {}
+void NewShapePkt::appendPayload(CharBuffer *que) {}
+uint16_t NewShapePkt::getPayloadWireSize() { return 0; }
+// Cmd_SetShape,
+SetShapePkt::SetShapePkt(uint16_t ShapeId, ShapeObj shapeData)
+    : GPU_Packet(Cmd_SetShape),
+      shapeData(shapeData) {}
+SetShapePkt::SetShapePkt(CharBuffer *que)
+    : GPU_Packet(que),
+      shapeData(que) {}
+SetShapePkt::~SetShapePkt() {}
+void SetShapePkt::appendPayload(CharBuffer *que) {}
+uint16_t SetShapePkt::getPayloadWireSize() {}
+// Cmd_MoveShape,
+MoveShapePkt::MoveShapePkt(uint16_t LutId)
+    : GPU_Packet(Cmd_SetShape) {}
+MoveShapePkt::MoveShapePkt(CharBuffer *que)
+    : GPU_Packet(que) {}
+MoveShapePkt::~MoveShapePkt() {}
+void MoveShapePkt::appendPayload(CharBuffer *que) {}
+uint16_t MoveShapePkt::getPayloadWireSize() {}
+
 FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
 FillBackGroundPkt::FillBackGroundPkt(CharBuffer *que) : GPU_Packet(que), fillColor(que) {}
-FillBackGroundPkt::~FillBackGroundPkt(){}
+FillBackGroundPkt::~FillBackGroundPkt() {}
 void FillBackGroundPkt::appendPayload(CharBuffer *que)
 {
     fillColor.appendToQue(que);
@@ -89,7 +118,7 @@ uint16_t FillBackGroundPkt::getPayloadWireSize()
 // Cmd_ResetGpu = 0xA5A5
 GpuResetPkt::GpuResetPkt(ResetType_Enum ResetType) : GPU_Packet(Cmd_ResetGpu), ResetType(ResetType) {}
 GpuResetPkt::GpuResetPkt(CharBuffer *que) : GPU_Packet(que), ResetType(que) {}
-GpuResetPkt::~GpuResetPkt(){}
+GpuResetPkt::~GpuResetPkt() {}
 void GpuResetPkt::appendPayload(CharBuffer *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
@@ -112,8 +141,9 @@ bool GPU_Channel::PacketReady()
     uint16_t packetSize = ctlUart.RxQue.peak_uint16(2);
     return (ctlUart.RxQue.getSize() >= packetSize);
 }
-bool GPU_Channel::processNextPacket() {
-    GPU_Packet* pkt = getNextPacket();
+bool GPU_Channel::processNextPacket()
+{
+    GPU_Packet *pkt = getNextPacket();
     pkt->actOnPkt();
     delete pkt;
     return true;
@@ -121,11 +151,11 @@ bool GPU_Channel::processNextPacket() {
 
 GPU_Packet *GPU_Channel::getNextPacket()
 {
-    CharBuffer* inputQue = &(this->ctlUart.RxQue);
+    CharBuffer *inputQue = &(this->ctlUart.RxQue);
     switch (this->peekCommand())
     {
     case Cmd_FillBackGround:
-        return new FillBackGroundPkt(inputQue);   
+        return new FillBackGroundPkt(inputQue);
     default:
         break;
     }

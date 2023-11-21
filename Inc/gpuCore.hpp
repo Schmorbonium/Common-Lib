@@ -266,19 +266,13 @@ public:
     // Implement in client and server
     virtual bool actOnPkt();
 };
-// Enum to determine what type of reset is requested
-enum ShapeType_Enum : uint16_t
-{
-    rectangle = 0x1,
-    circle,
-    triangle
-};
 
 // Cmd_NewShape,
 class NewShapePkt : public GPU_Packet
 {
+    ShapeObj shapeData;
 public:
-    NewShapePkt();
+    NewShapePkt(ShapeObj shapeData);
     NewShapePkt(CharBuffer *que);
     ~NewShapePkt();
     virtual void appendPayload(CharBuffer *que);
@@ -289,8 +283,9 @@ public:
 // Cmd_SetShape,
 class SetShapePkt : public GPU_Packet
 {
+    ShapeObj shapeData;
 public:
-    SetShapePkt(uint16_t ShapeId, ShapeType_Enum shapeType, uint16_t w, uint16_t h);
+    SetShapePkt(uint16_t ShapeId, ShapeObj shapeData);
     SetShapePkt(CharBuffer *que);
     ~SetShapePkt();
     virtual void appendPayload(CharBuffer *que);

@@ -7,6 +7,12 @@
 #include "RenderObj.hpp"
 
 extern GPU_Client gpu_client;
+// Implement in client and server
+// Implement in client and server
+// Implement in client and server
+bool NewShapePkt::actOnPkt(){}
+bool SetShapePkt::actOnPkt();
+bool MoveShapePkt::actOnPkt();
 
 // All of the Thing that must be Implemented on the client and server Side
 bool FrameIdPkt::actOnPkt() {return false;}
