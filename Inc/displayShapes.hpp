@@ -19,7 +19,9 @@ class ShapeObj : public IDrawable, ISendable
 {
 private:
 static IDManager ShapeIDManager;
-
+protected:
+    virtual void appendShapeDataToQue(CharBuffer *que);
+    virtual uint16_t GetShapeSize();
 public:
     Uint16Field shapeType;
     Uint16Field ShapeId;
@@ -28,11 +30,8 @@ public:
     ShapeObj(uint16_t shapeType, Color color);
     ShapeObj(CharBuffer *que);
 
-    virtual void appendShapeDataToQue(CharBuffer *que);
-    virtual uint16_t GetShapeSize();
 
     uint16_t getWireSize();
-
     void appendToQue(CharBuffer *que);
     static ShapeObj *ParseFromWire(CharBuffer *que);
 };

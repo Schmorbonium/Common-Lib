@@ -85,8 +85,12 @@ NewShapePkt::NewShapePkt(CharBuffer *que)
     : GPU_Packet(que),
       shapeData(que) {}
 NewShapePkt::~NewShapePkt() {}
-void NewShapePkt::appendPayload(CharBuffer *que) {}
-uint16_t NewShapePkt::getPayloadWireSize() { return 0; }
+
+void NewShapePkt::appendPayload(CharBuffer *que) {
+    shapeData.appendToQue(que);
+}
+uint16_t NewShapePkt::getPayloadWireSize() { return shapeData.getWireSize(); }
+
 // Cmd_SetShape,
 SetShapePkt::SetShapePkt(uint16_t ShapeId, ShapeObj shapeData)
     : GPU_Packet(Cmd_SetShape),

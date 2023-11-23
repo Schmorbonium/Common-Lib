@@ -27,8 +27,6 @@ bool GpuResetPkt::actOnPkt() {
 }
 
 // Implement in client and server
-// Implement in client and server
-// Implement in client and server
 bool NewShapePkt::actOnPkt(){return false;}
 bool SetShapePkt::actOnPkt(){return false;}
 bool MoveShapePkt::actOnPkt(){return false;}

@@ -1,6 +1,5 @@
 #ifdef USE_GPU_CLIENT
 
-
 #include "gpuClient.hpp"
 #include "lcd.hpp"
 #include "schmorby_assets.h"
@@ -10,29 +9,31 @@ extern GPU_Client gpu_client;
 // Implement in client and server
 // Implement in client and server
 // Implement in client and server
-bool NewShapePkt::actOnPkt(){}
-bool SetShapePkt::actOnPkt();
-bool MoveShapePkt::actOnPkt();
+bool NewShapePkt::actOnPkt() { return false; }
+bool SetShapePkt::actOnPkt() { return false; }
+bool MoveShapePkt::actOnPkt() { return false; }
 
 // All of the Thing that must be Implemented on the client and server Side
-bool FrameIdPkt::actOnPkt() {return false;}
-bool LutIdPkt::actOnPkt() {return false;}
-bool SpriteIdPkt::actOnPkt() {return false;}
-bool NewFramePkt::actOnPkt() {return false;}
-bool NewLutPkt::actOnPkt() {return false;}
-bool NewSpritePkt::actOnPkt() {return false;}
-bool LinkFramePkt::actOnPkt() {return false;}
-bool LinkMultiFramePkt::actOnPkt() {return false;}
-bool PlaceSpritePkt::actOnPkt() {return false;}
-bool AnimateSpritePkt::actOnPkt() {return false;}
-bool MoveSpritePkt::actOnPkt() {return false;}
-bool LoadFramePkt::actOnPkt() {return false;}
-bool LoadLutPkt::actOnPkt() {return false;}
-bool FillBackGroundPkt::actOnPkt() {
+bool FrameIdPkt::actOnPkt() { return false; }
+bool LutIdPkt::actOnPkt() { return false; }
+bool SpriteIdPkt::actOnPkt() { return false; }
+bool NewFramePkt::actOnPkt() { return false; }
+bool NewLutPkt::actOnPkt() { return false; }
+bool NewSpritePkt::actOnPkt() { return false; }
+bool LinkFramePkt::actOnPkt() { return false; }
+bool LinkMultiFramePkt::actOnPkt() { return false; }
+bool PlaceSpritePkt::actOnPkt() { return false; }
+bool AnimateSpritePkt::actOnPkt() { return false; }
+bool MoveSpritePkt::actOnPkt() { return false; }
+bool LoadFramePkt::actOnPkt() { return false; }
+bool LoadLutPkt::actOnPkt() { return false; }
+bool FillBackGroundPkt::actOnPkt()
+{
     gpu_client.display.clearFrame(this->fillColor.value);
     return true;
 }
-bool GpuResetPkt::actOnPkt(){
+bool GpuResetPkt::actOnPkt()
+{
     switch (this->ResetType.data)
     {
     case RST_init:
@@ -54,7 +55,6 @@ bool GpuResetPkt::actOnPkt(){
     }
     return true;
 }
-
 
 GPU_Client::GPU_Client(UART_HandleTypeDef *Core,
                        SPI_HandleTypeDef *Spi,
@@ -81,7 +81,8 @@ GPU_Client::GPU_Client(UART_HandleTypeDef *Core,
 {
 }
 
-void GPU_Client::markInitalized(){
+void GPU_Client::markInitalized()
+{
     this->initialized = true;
 }
 
@@ -182,8 +183,10 @@ void GPU_Client::testDisplay()
 
     HAL_Delay(100);
 
-    while(1){
-        if(this->PacketReady()){
+    while (1)
+    {
+        if (this->PacketReady())
+        {
             this->processNextPacket();
         }
     }
