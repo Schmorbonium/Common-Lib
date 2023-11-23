@@ -23,7 +23,7 @@ void SpiShiftReg_Core::FeedDataOverSpi(uint16_t *data)
     HAL_SPI_Transmit(ledSpi,
                      (uint8_t *)this->stagedData,
                      this->chipDepth,
-                     0);
+                     HAL_MAX_DELAY);
     latchData();
 }
 
