@@ -7,6 +7,8 @@
 
 class GPU_Client : public GPU_Channel
 {
+protected:
+    
 public:
     bool initialized = false;
     LCD_Controller display;
