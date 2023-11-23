@@ -3,6 +3,7 @@
 #include "zHal.h"
 #include "lcd.hpp"
 #include "uartData.hpp"
+#include "isaacsTypes.hpp"
 
 
 // Enum to determine what type of reset is requested
@@ -13,10 +14,15 @@ enum ShapeType_Enum : uint16_t
     s_enum_triangle
 };
 
+
 class ShapeObj : public IDrawable, ISendable
 {
+private:
+static IDManager ShapeIDManager;
+
 public:
     Uint16Field shapeType;
+    Uint16Field ShapeId;
     ColorField fillColor;
 
     ShapeObj(uint16_t shapeType, Color color);

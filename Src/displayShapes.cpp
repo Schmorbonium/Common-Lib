@@ -1,12 +1,18 @@
 #include "zHal.h"
 #include "lcd.hpp"
 #include "displayShapes.hpp"
+#include "isaacsTypes.hpp"
 
 ShapeObj::ShapeObj(uint16_t shapeType, Color color)
     : shapeType(shapeType),
-      fillColor(color) {}
+      ShapeId(ShapeIDManager.allocateID()),
+      fillColor(color)
+{
+    // this->ShapeId.data = ShapeIDManager.allocateID();
+}
 ShapeObj::ShapeObj(CharBuffer *que)
     : shapeType(que),
+      ShapeId(que),
       fillColor(que) {}
 
 void ShapeObj::appendShapeDataToQue(CharBuffer *que) {}
@@ -14,12 +20,13 @@ uint16_t ShapeObj::GetShapeSize() { return 0; }
 
 uint16_t ShapeObj::getWireSize()
 {
-    return shapeType.getWireSize() + fillColor.getWireSize() + GetShapeSize();
+    return shapeType.getWireSize() + ShapeId.getWireSize() + fillColor.getWireSize() + GetShapeSize();
 }
 
 void ShapeObj::appendToQue(CharBuffer *que)
 {
     shapeType.appendToQue(que);
+    ShapeId.appendToQue(que);
     fillColor.appendToQue(que);
     appendShapeDataToQue(que);
 }
@@ -41,6 +48,7 @@ ShapeObj *ShapeObj::ParseFromWire(CharBuffer *que)
     default:
         break;
     }
+    return nullptr;
 }
 
 RectangleObj::RectangleObj(uint16_t x, uint16_t y, uint16_t w, uint16_t h, Color color)
