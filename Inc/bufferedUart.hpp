@@ -4,6 +4,8 @@
 
 #include "zHal.h"
 #include "charBuffer.hpp"
+#include "ibc.h"
+
 
 class BufferedUart
 {
@@ -17,6 +19,9 @@ protected:
     void stopSending();
     bool pendingReadInterrupt();
     bool pendingWriteInterrupt();
+    IbcResetCallback asyncResetCallback;
+    uint16_t resetCountLimit;
+    uint16_t zeroCount;
 public:
     BufferedUart(UART_HandleTypeDef* Core);
     ~BufferedUart(){}
@@ -27,6 +32,8 @@ public:
     void takeFromInbox(uint8_t* buf, uint16_t size);
     uint16_t getInputSize();
     uint16_t getOutputSize();
+    void setResetCallback(IbcResetCallback resetCallback);
+    void setResetCount(uint16_t count);
 };
 
 

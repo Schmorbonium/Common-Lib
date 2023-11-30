@@ -10,8 +10,8 @@ void processIbcInbox() {
     }
 }
 
-void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, uint8_t attnMask) {
-    handler = new IbcHandler(huart, callback, attnMask);
+void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, IbcResetCallback resetCallback, uint8_t attnMask) {
+    handler = new IbcHandler(huart, callback, resetCallback, attnMask);
     handler->startListening();
 }
 

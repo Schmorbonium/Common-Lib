@@ -2,14 +2,37 @@
 #include "ibc.h"
 #include "ibcPacket.hpp"
 
-IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, uint8_t attnMask) :
+uint8_t resetFlag = 0;
+void setResetFlag();
+
+IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, IbcResetCallback _resetCallback, uint8_t attnMask) :
     BufferedUart(huart),
     callback(_callback),
     attnMask(attnMask) {
     this->stagedPacket = 0;
+    this->syncResetCallback = _resetCallback;
+    this->asyncResetCallback = setResetFlag;
+    this->resetCountLimit = 8;
+    sendResetVector();
+}
+
+void IbcHandler::sendResetVector() {
+    for (int i = 0; i < resetCountLimit; i++) {
+        TxQue.append(0);
+    }
+}
+
+void setResetFlag() {
+    resetFlag = 1;
 }
 
 bool IbcHandler::hasCompletePacket() {
+    // special reset pkt case
+    if (resetFlag) {
+        syncResetCallback();
+        resetFlag = 0;
+    }
+
     // buffer does not have enough bytes to check header
     if (this->RxQue.getSize() < 2) {
         return false;
@@ -41,7 +64,7 @@ void IbcHandler::processStagedPacket() {
     }
 }
 
-void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data){
+void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
     IbcPacket p = IbcPacket(attn, ttl, len, id, data);
     p.queueInto(&TxQue);
     startSending();
