@@ -9,19 +9,20 @@
 
 #define HYBRID_NODE_SIZE 16
 
-
-// Hybrid Queue (Gotta reduce that allocation time)
 template <typename T>
-class Queue
-{
-
-protected:
 struct HybridNode
 {
     T data[HYBRID_NODE_SIZE];
     HybridNode *next;
     HybridNode() : next(nullptr) {}
 };
+// Hybrid Queue (Gotta reduce that allocation time)
+template <typename T>
+class Queue
+{
+
+protected:
+
 public:
     Queue() : head(nullptr), tail(nullptr), size(0)
     {
@@ -112,52 +113,52 @@ private:
 };
 
 // Map Built on linked list
-template<typename Key, typename Value>
-class LinkedListMap {
-private:
-    struct LinkListNode {
-        Key key;
-        Value value;
-        LinkListNode* next;
+// template<typename Key, typename Value>
+// class LinkedListMap {
+// private:
+//     struct LinkListNode {
+//         Key key;
+//         Value value;
+//         LinkListNode* next;
 
-        LinkListNode(const Key& k, const Value& v, LinkListNode* n) : key(k), value(v), next(n) {}
-    };
+//         LinkListNode(const Key& k, const Value& v, LinkListNode* n) : key(k), value(v), next(n) {}
+//     };
 
-    LinkListNode* head;
+//     LinkListNode* head;
 
-public:
-    LinkedListMap() : head(nullptr) {}
+// public:
+//     LinkedListMap() : head(nullptr) {}
 
-    ~LinkedListMap() {
-        Node* current = head;
-        while (current != nullptr) {
-            Node* temp = current;
-            current = current->next;
-            delete temp;
-        }
-    }
+//     ~LinkedListMap() {
+//         Node* current = head;
+//         while (current != nullptr) {
+//             Node* temp = current;
+//             current = current->next;
+//             delete temp;
+//         }
+//     }
 
-    void insert(const Key& key, const Value& value) {
-        // If the Key is in the set update it
-        for (Node* current = head; current != nullptr; current = current->next) {
-            if (current->key == key) {
-                current->value = value;
-                return;
-            }
-        }
-        // Otherwise we are adding it to the front of the list
-        head = new Node(key, value, head);
-    }
+//     void insert(const Key& key, const Value& value) {
+//         // If the Key is in the set update it
+//         for (Node* current = head; current != nullptr; current = current->next) {
+//             if (current->key == key) {
+//                 current->value = value;
+//                 return;
+//             }
+//         }
+//         // Otherwise we are adding it to the front of the list
+//         head = new Node(key, value, head);
+//     }
 
-    Value* find(const Key& key) {
-        for (Node* current = head; current != nullptr; current = current->next) {
-            if (current->key == key) {
-                return &current->value;
-            }
-        }
-        return nullptr;
-    }
-};
+//     Value* find(const Key& key) {
+//         for (Node* current = head; current != nullptr; current = current->next) {
+//             if (current->key == key) {
+//                 return &current->value;
+//             }
+//         }
+//         return nullptr;
+//     }
+// };
 
 
 //  ID Manager
