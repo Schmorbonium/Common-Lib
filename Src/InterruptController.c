@@ -2,7 +2,7 @@
 #include "zHal.h"
 
 // Static variable to keep track of the interrupt count
-static uint16_t count = 0;
+static volatile uint16_t count = 0;
 
 static inline void blockInterrupts() {
     __disable_irq();
