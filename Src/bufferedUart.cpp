@@ -6,8 +6,9 @@ void dummyResetCallback() {
 
 BufferedUart::BufferedUart(UART_HandleTypeDef* Core) :
     listening(false),
-    TxQue(),
     uart(Core),
+    sending(false),
+    TxQue(),
     asyncResetCallback(dummyResetCallback),
     resetCountLimit(0xFFFF), 
     RxQue() {
@@ -18,6 +19,15 @@ void BufferedUart::send(uint8_t* buf, uint16_t length) {
     {
         TxQue.append(buf[i]);
     }
+    if (sending == false)
+    {
+        startSending();
+    }
+}
+
+void BufferedUart::send(ISendable* sendableObj)
+{
+    sendableObj->appendToQue(&this->TxQue);
     if (sending == false)
     {
         startSending();
