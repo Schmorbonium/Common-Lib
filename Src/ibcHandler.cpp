@@ -1,6 +1,7 @@
 #include "ibcHandler.hpp"
 #include "ibc.h"
 #include "ibcPacket.hpp"
+#include "InterruptController.h"
 
 uint8_t resetFlag = 0;
 void setResetFlag();
@@ -45,8 +46,10 @@ bool IbcHandler::hasCompletePacket() {
     }
 
     // stage this packet to be processed
+    InterruptController_enter();
     delete this->stagedPacket;
     this->stagedPacket = new IbcPacket(&this->RxQue);
+    InterruptController_leave();
     return true;
 }
 
@@ -65,7 +68,9 @@ void IbcHandler::processStagedPacket() {
 }
 
 void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
+    InterruptController_enter();
     IbcPacket p = IbcPacket(attn, ttl, len, id, data);
+    InterruptController_leave();
     p.queueInto(&TxQue);
     startSending();
 }
