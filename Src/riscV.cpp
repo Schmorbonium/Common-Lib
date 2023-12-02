@@ -131,5 +131,6 @@ PC::PC(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
 
 bool PC::evaluate()
 {
-    return false;
+    this->programCounter = processor->newPC.programCounter;
+    return true;
 }
