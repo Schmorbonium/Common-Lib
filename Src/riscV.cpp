@@ -75,7 +75,6 @@ bool NewPC::evaluate()
         switch (processor->decodedInstruction.funct3)
         {
         case 0x0: // BEQ
-
             if (processor->alu.out == 0) // branch true
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
@@ -105,7 +104,9 @@ bool NewPC::evaluate()
     }
     else if (processor->decodedInstruction.jump)
         programCounter = (processor->pc.programCounter + processor->decodedInstruction.immediate_val) & 0xFFFFFFFE;
-    return false;
+    else
+        ;
+    return true;
 }
 
 /*****************************************
@@ -289,7 +290,7 @@ bool DecodedInstruction::evaluate()
     default:
         break;
     }
-    return false;
+    return true;
 }
 
 /*****************************************
