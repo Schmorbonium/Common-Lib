@@ -32,6 +32,15 @@ public:
     {
         clear();
     }
+    
+    // Delete copy constructor and copy assignment operator
+    Queue(const Queue&) = delete;
+    Queue& operator=(const Queue&) = delete;
+
+    // Delete move constructor and move assignment operator
+    Queue(Queue&&) = delete;
+    Queue& operator=(Queue&&) = delete;
+
     void enqueue(T value)
     {
         tailIndex++;
