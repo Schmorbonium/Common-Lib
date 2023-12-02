@@ -1,4 +1,5 @@
 #include "charBuffer.hpp"
+#include "InterruptController.h"
 
 CharBuffer::CharBuffer() : size(0), head(nullptr), headIndex(0), tail(nullptr), tailIndex(0) {}
 
@@ -10,7 +11,7 @@ CharBuffer::~CharBuffer()
 // Add a character to the end of the buffer
 void CharBuffer::append(uint8_t c)
 {
-    __disable_irq();
+    InterruptController_enter();
     tailIndex++;
     if (tail == nullptr || tailIndex == NODE_SIZE)
     {
@@ -29,13 +30,13 @@ void CharBuffer::append(uint8_t c)
     }
     tail->data[tailIndex] = c;
     size++;
-    __enable_irq();
+    InterruptController_leave();
 }
 
 // Remove and return the first character in the buffer
 uint8_t CharBuffer::pop()
 {
-    __disable_irq();
+    InterruptController_enter();
     if (size == 0)
     {
         return 0;
@@ -56,7 +57,7 @@ uint8_t CharBuffer::pop()
         delete temp;
         headIndex = 0;
     }
-    __enable_irq();
+    InterruptController_leave();
     return value;
 }
 
@@ -91,7 +92,7 @@ bool CharBuffer::isEmpty() const
 // Clear the buffer and release memory
 void CharBuffer::clear()
 {
-    __disable_irq();
+    InterruptController_enter();
     while (head != nullptr)
     {
         Node *temp = head;
@@ -102,7 +103,7 @@ void CharBuffer::clear()
     size = 0;
     tailIndex = 0;
     headIndex = 0;
-    __enable_irq();
+    InterruptController_leave();
 }
 
 // Print the contents of the buffer
@@ -121,26 +122,29 @@ void CharBuffer::print() const
     }
 }
 
-void CharBuffer::append_uint16(uint16_t c){
+void CharBuffer::append_uint16(uint16_t c)
+{
     this->append(c & 0xFF);
-    this->append((c >> 8 )& 0xFF);
+    this->append((c >> 8) & 0xFF);
 }
 
-void CharBuffer::append_uint32(uint32_t c){
-    this->append(c         & 0xFF);
-    this->append((c >> 8 ) & 0xFF);
-    this->append((c >> 16 )& 0xFF);
-    this->append((c >> 24 )& 0xFF);
-    
+void CharBuffer::append_uint32(uint32_t c)
+{
+    this->append(c & 0xFF);
+    this->append((c >> 8) & 0xFF);
+    this->append((c >> 16) & 0xFF);
+    this->append((c >> 24) & 0xFF);
 }
 
-uint16_t CharBuffer::pop_uint16(){
+uint16_t CharBuffer::pop_uint16()
+{
     uint16_t d = this->pop();
     d |= this->pop() << 8;
     return d;
 }
 
-uint32_t CharBuffer::pop_uint32(){
+uint32_t CharBuffer::pop_uint32()
+{
     uint32_t d = this->pop();
     d |= this->pop() << 8;
     d |= this->pop() << 16;
@@ -148,19 +152,22 @@ uint32_t CharBuffer::pop_uint32(){
     return d;
 }
 
-uint16_t CharBuffer::peak_uint16() const {
+uint16_t CharBuffer::peak_uint16() const
+{
     uint16_t d = this->peak(0);
     d |= this->peak(1) << 8;
     return d;
 }
 
-uint16_t CharBuffer::peak_uint16(uint16_t startingIndex) const {
+uint16_t CharBuffer::peak_uint16(uint16_t startingIndex) const
+{
     uint16_t d = this->peak(startingIndex);
     d |= this->peak(startingIndex + 1) << 8;
     return d;
 }
 
-uint32_t CharBuffer::peak_uint32() const {
+uint32_t CharBuffer::peak_uint32() const
+{
     uint32_t d = this->peak(0);
     d |= this->peak(1) << 8;
     d |= this->peak(2) << 16;
