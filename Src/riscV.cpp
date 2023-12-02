@@ -1,15 +1,14 @@
 #include "riscV.hpp"
 
 riscV::riscV() : process(),
-                 pc(&process, this),
-                 instruction(&process, this),
-                 decodedInstruction(&process, this),
-                 registerOut(&process, this),
-                 alu(&process, this),
-                 newPC(&process, this),
-                 memOp(&process, this),
-                 regWrite(&process, this)
-{
+pc(&process, this),
+instruction(&process, this),
+decodedInstruction(&process, this),
+registerOut(&process, this),
+alu(&process, this),
+newPC(&process, this),
+memOp(&process, this),
+regWrite(&process, this) {
     instruction.addDependency(&pc);
     decodedInstruction.addDependency(&instruction);
     registerOut.addDependency(&decodedInstruction);
@@ -26,110 +25,115 @@ riscV::riscV() : process(),
     regWrite.addDependency(&memOp);
 }
 
-riscV::~riscV()
-{
+riscV::~riscV() {
 }
 
 /*****************************************
  * MemoryOp Node
  *****************************************/
-MemoryOp::MemoryOp(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+MemoryOp::MemoryOp(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool MemoryOp::evaluate()
-{
+bool MemoryOp::evaluate() {
     return false;
 }
 
 /*****************************************
  * RegisterWrite
  *****************************************/
-RegisterWrite::RegisterWrite(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+RegisterWrite::RegisterWrite(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
+    for (int i = 0; i < 16; i++) {
+        regs[i] = 0;
+    }
 }
 
-bool RegisterWrite::evaluate()
-{
+bool RegisterWrite::evaluate() {
+    if (processor->decodedInstruction.regWriteEnable) {
+        switch (processor->decodedInstruction.regDestMux) {
+        case 0: //aluQ
+            regs[processor->decodedInstruction.regDest_select] = processor->alu.output;
+            break;
+        case 1: // pc+4
+            regs[processor->decodedInstruction.regDest_select] = processor->pc.programCounter;
+            break;
+        case 2: // memData
+            regs[processor->decodedInstruction.regDest_select] = processor->memOp.dataOut;
+            break;
+        case 3: // imm
+            regs[processor->decodedInstruction.regDest_select] = processor->decodedInstruction.immediate_val;
+            break;
+        }
+        return true;
+    }
     return false;
 }
 
 /*****************************************
  * NewPC
  *****************************************/
-NewPC::NewPC(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+NewPC::NewPC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool NewPC::evaluate()
-{
+bool NewPC::evaluate() {
     return false;
 }
 
 /*****************************************
  * ALUOut
  *****************************************/
-ALUOut::ALUOut(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+ALUOut::ALUOut(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool ALUOut::evaluate()
-{
+bool ALUOut::evaluate() {
     return false;
 }
 
 /*****************************************
  * RegisterOutputs
  *****************************************/
-RegisterOutputs::RegisterOutputs(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+RegisterOutputs::RegisterOutputs(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool RegisterOutputs::evaluate()
-{
-    return false;
+bool RegisterOutputs::evaluate() {
+    regA_value = processor->regWrite.regs[processor->decodedInstruction.regA_select];
+    regB_value = processor->regWrite.regs[processor->decodedInstruction.regB_select];
+    return true;
 }
 
 /*****************************************
  * DecodedInstruction
  *****************************************/
-DecodedInstruction::DecodedInstruction(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+DecodedInstruction::DecodedInstruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool DecodedInstruction::evaluate()
-{
+bool DecodedInstruction::evaluate() {
     return false;
 }
 
 /*****************************************
  * Instruction
  *****************************************/
-Instruction::Instruction(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+Instruction::Instruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool Instruction::evaluate()
-{
+bool Instruction::evaluate() {
     return false;
 }
 
 /*****************************************
  * PC
  *****************************************/
-PC::PC(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
-{
+PC::PC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
 }
 
-bool PC::evaluate()
-{
+bool PC::evaluate() {
     return false;
 }
