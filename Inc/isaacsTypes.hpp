@@ -32,7 +32,7 @@ public:
     {
         clear();
     }
-    
+
     // Delete copy constructor and copy assignment operator
     Queue(const Queue&) = delete;
     Queue& operator=(const Queue&) = delete;
@@ -121,6 +121,55 @@ private:
     uint8_t headIndex;
 };
 
+
+template <typename T>
+class ArrayList {
+public:
+    ArrayList() : size(0) {}
+
+    bool add(T* item) {
+        if (size < MAX_SIZE) {
+            array[size++] = item;
+            return true;
+        }
+        return false;
+    }
+
+    T* get(size_t index) const {
+        if (index < size) {
+            return array[index];
+        }
+        return nullptr;
+    }
+
+    bool remove(size_t index) {
+        if (index < size) {
+            for (size_t i = index; i < size - 1; ++i) {
+                array[i] = array[i + 1];
+            }
+            size--;
+            return true;
+        }
+        return false;
+    }
+
+    uint16_t getSize() const {
+        return size;
+    }
+
+    bool isFull() const {
+        return size == MAX_SIZE;
+    }
+
+    bool isEmpty() const {
+        return size == 0;
+    }
+
+private:
+    static const size_t MAX_SIZE = 4;
+    T* array[MAX_SIZE];
+    uint16_t size;
+};
 // Map Built on linked list
 // template<typename Key, typename Value>
 // class LinkedListMap {
