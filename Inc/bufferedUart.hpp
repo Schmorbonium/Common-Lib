@@ -32,6 +32,15 @@ public:
     CharBuffer RxQue;
     BufferedUart(UART_HandleTypeDef* Core);
     ~BufferedUart(){}
+
+    // Delete copy constructor and copy assignment operator
+    BufferedUart(const BufferedUart&) = delete;
+    BufferedUart& operator=(const BufferedUart&) = delete;
+
+    // Delete move constructor and move assignment operator
+    BufferedUart(BufferedUart&&) = delete;
+    BufferedUart& operator=(BufferedUart&&) = delete;
+
     virtual void uartHandler();
     void startListening();
     void stopListening();

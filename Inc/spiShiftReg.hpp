@@ -29,6 +29,15 @@ public:
                      uint16_t _latchPin);
 
     virtual ~SpiShiftReg_Core();
+
+    // Delete copy constructor and copy assignment operator
+    SpiShiftReg_Core(const SpiShiftReg_Core&) = delete;
+    SpiShiftReg_Core& operator=(const SpiShiftReg_Core&) = delete;
+
+    // Delete move constructor and move assignment operator
+    SpiShiftReg_Core(SpiShiftReg_Core&&) = delete;
+    SpiShiftReg_Core& operator=(SpiShiftReg_Core&&) = delete;
+
     void startup();
     virtual void DrawTick();
 };
@@ -48,6 +57,14 @@ public:
                       GPIO_TypeDef *_latchGpio,
                       uint16_t _latchPin);
     virtual ~DirectSpiShiftReg();
+    // Delete copy constructor and copy assignment operator
+    DirectSpiShiftReg(const DirectSpiShiftReg&) = delete;
+    DirectSpiShiftReg& operator=(const DirectSpiShiftReg&) = delete;
+
+    // Delete move constructor and move assignment operator
+    DirectSpiShiftReg(DirectSpiShiftReg&&) = delete;
+    DirectSpiShiftReg& operator=(DirectSpiShiftReg&&) = delete;
+
     void setChipValue(uint16_t chipIndex, uint16_t value);
     void setBrightness(uint8_t newValue);
     // void shiftLeft();
@@ -78,6 +95,16 @@ public:
                       uint16_t _latchPin,
                       uint8_t frameDepth);
     virtual ~MultiFrameSiftReg();
+
+    // Delete copy constructor and copy assignment operator
+    MultiFrameSiftReg(const MultiFrameSiftReg&) = delete;
+    MultiFrameSiftReg& operator=(const MultiFrameSiftReg&) = delete;
+
+    // Delete move constructor and move assignment operator
+    MultiFrameSiftReg(MultiFrameSiftReg&&) = delete;
+    MultiFrameSiftReg& operator=(MultiFrameSiftReg&&) = delete;
+
+
     void setChipValue(uint8_t frame, uint16_t chipIndex, uint16_t value);
     void setBrightness(uint8_t frame, uint8_t newValue);
     virtual void DrawTick();
