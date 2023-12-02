@@ -1,15 +1,10 @@
 #include "bufferedUart.hpp"
 
-void dummyResetCallback() {
-    //purposely empty
-}
-
 BufferedUart::BufferedUart(UART_HandleTypeDef* Core) :
     listening(false),
     uart(Core),
     sending(false),
     TxQue(),
-    asyncResetCallback(dummyResetCallback),
     resetCountLimit(0xFFFF), 
     RxQue() {
 }
@@ -48,7 +43,6 @@ void BufferedUart::takeFromInbox(uint8_t* buf, uint16_t count) {
     {
         buf[i] = RxQue.pop();
     }
-    
 }
 
 void BufferedUart::startSending() {
@@ -67,15 +61,22 @@ void BufferedUart::stopListening() {
     _ZHAL_UART_RESET_RXI(uart->Instance);
     listening = false;
 }
+
 void BufferedUart::uartHandler() {
     while (_ZHAL_UART_RX_READY(uart->Instance))
     {
         uint8_t data = _ZHAL_UART_RX_BYTE(uart->Instance);
+        if(data == 0 && justReset){
+            continue;
+        }
+        justReset = false;
         RxQue.append(data);
         if (data == 0) {
             zeroCount++;
             if (zeroCount >= resetCountLimit) {
-                this->asyncResetCallback();
+                this->RxQue.clear();
+                justReset = true;
+                zeroCount=0;
             }
         } else {
             zeroCount = 0;
@@ -93,11 +94,6 @@ void BufferedUart::uartHandler() {
             stopSending();
         }
     }
-}
-
-
-void BufferedUart::setResetCallback(IbcResetCallback resetCallback) {
-    this->asyncResetCallback = resetCallback;
 }
 
 void BufferedUart::setResetCount(uint16_t count) {
