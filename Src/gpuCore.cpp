@@ -100,7 +100,7 @@ SetShapePkt::SetShapePkt(CharBuffer *que)
       shapeData(que) {}
 SetShapePkt::~SetShapePkt() {}
 void SetShapePkt::appendPayload(CharBuffer *que) {}
-uint16_t SetShapePkt::getPayloadWireSize() {}
+uint16_t SetShapePkt::getPayloadWireSize() {return shapeData.getWireSize();}
 // Cmd_MoveShape,
 MoveShapePkt::MoveShapePkt(uint16_t LutId)
     : GPU_Packet(Cmd_SetShape) {}
@@ -108,7 +108,7 @@ MoveShapePkt::MoveShapePkt(CharBuffer *que)
     : GPU_Packet(que) {}
 MoveShapePkt::~MoveShapePkt() {}
 void MoveShapePkt::appendPayload(CharBuffer *que) {}
-uint16_t MoveShapePkt::getPayloadWireSize() {}
+uint16_t MoveShapePkt::getPayloadWireSize() {return 0;}
 
 FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
 FillBackGroundPkt::FillBackGroundPkt(CharBuffer *que) : GPU_Packet(que), fillColor(que) {}
