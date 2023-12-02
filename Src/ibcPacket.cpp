@@ -20,7 +20,7 @@ IbcPacket::IbcPacket(CharBuffer* buf) {
     for (int i = len - 1; i >= 0; i--) {
         (this->data)[i] = buf->pop();
     }
-    InterruptController_leave()
+    InterruptController_leave();
 }
 
 
