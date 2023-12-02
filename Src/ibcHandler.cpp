@@ -31,6 +31,7 @@ bool IbcHandler::hasCompletePacket() {
     // special reset pkt case
     if (resetFlag) {
         syncResetCallback();
+        RxQue.clear();
         resetFlag = 0;
     }
 
