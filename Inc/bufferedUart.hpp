@@ -20,8 +20,8 @@ protected:
     bool listening;
     UART_HandleTypeDef* uart;
     bool sending;
-    void startSending();
     CharBuffer TxQue;
+    void startSending();
     void stopSending();
     bool pendingReadInterrupt();
     bool pendingWriteInterrupt();

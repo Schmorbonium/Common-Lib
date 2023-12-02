@@ -6,8 +6,9 @@ void dummyResetCallback() {
 
 BufferedUart::BufferedUart(UART_HandleTypeDef* Core) :
     listening(false),
-    TxQue(),
     uart(Core),
+    sending(false),
+    TxQue(),
     asyncResetCallback(dummyResetCallback),
     resetCountLimit(0xFFFF), 
     RxQue() {
