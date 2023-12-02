@@ -27,7 +27,8 @@ typedef enum {
     // INSTruction DATa
     IBCID_INSTDAT = 0x09,
     // Controller to Memory flags (len 1)
-    // 0b XXXE
+    // 0b XXRE
+    // - [1] R: Memory Read Enable
     // - [0] E: Memory write enable
     IBCID_C2MFLAGS = 0x0A,
 
