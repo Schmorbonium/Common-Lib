@@ -12,9 +12,11 @@ IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, I
     attnMask(attnMask) {
     this->stagedPacket = 0;
     this->syncResetCallback = _resetCallback;
-    this->asyncResetCallback = setResetFlag;
     this->resetCountLimit = 8;
     sendResetVector();
+    uint8_t dummyData = 0;
+    //send reset packet
+    sendPacket((IBCATTN) 0xF, 3, 1, IBCID_RESET, &dummyData);
 }
 
 void IbcHandler::sendResetVector() {
@@ -29,11 +31,11 @@ void setResetFlag() {
 
 bool IbcHandler::hasCompletePacket() {
     // special reset pkt case
-    if (resetFlag) {
-        syncResetCallback();
-        RxQue.clear();
-        resetFlag = 0;
-    }
+    // if (resetFlag) {
+    //     syncResetCallback();
+    //     RxQue.clear();
+    //     resetFlag = 0;
+    // }
 
     // buffer does not have enough bytes to check header
     if (this->RxQue.getSize() < 2) {
@@ -55,9 +57,10 @@ bool IbcHandler::hasCompletePacket() {
 }
 
 void IbcHandler::processStagedPacket() {
-    // if this packet is relevant to this board, send it back up the chain
-    if ((this->stagedPacket->attn & this->attnMask)) {
-        this->callback(this->stagedPacket->id, this->stagedPacket->len, this->stagedPacket->data);
+    // if this is a reset packet, prefix with a reset 
+    //  vector to ensure the next board can receive it
+    if ((this->stagedPacket->id) == IBCID_RESET) {
+        sendResetVector();
     }
 
     // if this packet has more time to live, forward it
@@ -66,6 +69,12 @@ void IbcHandler::processStagedPacket() {
         this->stagedPacket->queueInto(&this->TxQue);
         this->startSending();
     }
+
+    // if this packet is relevant to this board, send it back up the chain
+    if ((this->stagedPacket->attn & this->attnMask)) {
+        this->callback(this->stagedPacket->id, this->stagedPacket->len, this->stagedPacket->data);
+    }
+
 }
 
 void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {

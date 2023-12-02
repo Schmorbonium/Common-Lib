@@ -55,7 +55,9 @@ typedef enum {
     IBCID_GETREG = 0x11,
     IBCID_SETPC = 0x12,
     IBCID_GETPC = 0x13,
-    IBCID_GETFLAGS = 0x14
+    IBCID_GETFLAGS = 0x14,
+    
+    IBCID_RESET = 0x1F
 } IBCID;
 
 typedef enum {
