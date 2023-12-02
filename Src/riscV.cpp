@@ -1,4 +1,5 @@
 #include "riscV.hpp"
+#include "ibc.h"
 
 riscV::riscV() : process(),
 pc(&process, this),
@@ -54,7 +55,7 @@ RegisterWrite::RegisterWrite(DependencyTree* parent, riscV* processor) : IDepend
 bool RegisterWrite::evaluate() {
     if (processor->decodedInstruction.regWriteEnable) {
         switch (processor->decodedInstruction.regDestMux) {
-        case 0: //aluQ
+        case 0: //output
             regs[processor->decodedInstruction.regDest_select] = processor->alu.output;
             break;
         case 1: // pc+4
@@ -93,7 +94,57 @@ ALUOut::ALUOut(DependencyTree* parent, riscV* processor) : IDependencyNode(paren
 }
 
 bool ALUOut::evaluate() {
-    return false;
+    uint32_t leftOperand;
+    uint32_t rightOperand;
+
+    if (processor->decodedInstruction.aluSrcAIsPC) {
+        leftOperand = processor->pc.programCounter;
+    } else {
+        leftOperand = processor->registerOut.regA_value;
+    }
+
+    if (processor->decodedInstruction.aluSrcBIsImm) {
+        rightOperand = processor->decodedInstruction.immediate_val;
+    } else {
+        rightOperand = processor->registerOut.regB_value;
+    }
+    switch (processor->decodedInstruction.aluOp) {
+    case IBC_ALUOP_ADD:
+        output = leftOperand + rightOperand;
+        break;
+    case IBC_ALUOP_SLL:
+        output = leftOperand << rightOperand;
+        break;
+    case IBC_ALUOP_SLT:
+        output = (int32_t)leftOperand < (int32_t)rightOperand ? 1 : 0;
+        break;
+    case IBC_ALUOP_SLTU:
+        output = leftOperand < rightOperand ? 1 : 0;
+        break;
+    case IBC_ALUOP_XOR:
+        output = leftOperand ^ rightOperand;
+        break;
+    case IBC_ALUOP_SRL:
+        output = leftOperand >> rightOperand;
+        break;
+    case IBC_ALUOP_OR:
+        output = leftOperand | rightOperand;
+        break;
+    case IBC_ALUOP_AND:
+        output = leftOperand & rightOperand;
+        break;
+    case IBC_ALUOP_SUB:
+        output = leftOperand - rightOperand;
+        break;
+    case IBC_ALUOP_SRA:
+        output = (int32_t)leftOperand >> (int32_t)rightOperand;
+        break;
+    default:
+        //TODO: best behavior for unknown ALUop code
+        break;
+    }
+
+    return true;
 }
 
 /*****************************************
