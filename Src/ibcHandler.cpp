@@ -14,9 +14,6 @@ IbcHandler::IbcHandler(UART_HandleTypeDef* huart, IbcPacketCallback _callback, I
     this->syncResetCallback = _resetCallback;
     this->resetCountLimit = 8;
     sendResetVector();
-    uint8_t dummyData = 0;
-    //send reset packet
-    sendPacket((IBCATTN) 0xF, 3, 1, IBCID_RESET, &dummyData);
 }
 
 void IbcHandler::sendResetVector() {
@@ -78,9 +75,9 @@ void IbcHandler::processStagedPacket() {
 }
 
 void IbcHandler::sendPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
-    InterruptController_enter();
+    // InterruptController_enter();
     IbcPacket p = IbcPacket(attn, ttl, len, id, data);
-    InterruptController_leave();
     p.queueInto(&TxQue);
     startSending();
+    // InterruptController_leave();
 }

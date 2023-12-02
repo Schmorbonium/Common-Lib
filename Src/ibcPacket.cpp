@@ -1,4 +1,5 @@
 #include "ibcPacket.hpp"
+#include "InterruptController.h"
 
 #define IBCP_ATTN(header) ((IBCATTN)((header & 0xF000) >> 12))
 #define IBCP_TTL(header) ((header & 0x0300) >> 8)
@@ -14,10 +15,12 @@ IbcPacket::IbcPacket(CharBuffer* buf) {
     this->ttl = IBCP_TTL(header);
     this->len = IBCP_LEN(header);
     this->id = IBCP_ID(header);
+    InterruptController_enter();
     this->data = new uint8_t[this->len];
     for (int i = len - 1; i >= 0; i--) {
         (this->data)[i] = buf->pop();
     }
+    InterruptController_leave()
 }
 
 
@@ -33,7 +36,9 @@ IbcPacket::IbcPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* 
 }
 
 IbcPacket::~IbcPacket() {
+    InterruptController_enter();
     delete this->data;
+    InterruptController_leave();
 }
 
 void IbcPacket::queueInto(CharBuffer* buf) {

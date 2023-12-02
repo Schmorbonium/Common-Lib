@@ -13,6 +13,8 @@ void processIbcInbox() {
 void initIbc(UART_HandleTypeDef* huart, IbcPacketCallback callback, IbcResetCallback resetCallback, uint8_t attnMask) {
     handler = new IbcHandler(huart, callback, resetCallback, attnMask);
     handler->startListening();
+    uint8_t dummyData = 0;
+    handler->sendPacket((IBCATTN) 0xF, 3, 1, IBCID_RESET, &dummyData);
 }
 
 void sendIbcPacket(uint8_t attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
