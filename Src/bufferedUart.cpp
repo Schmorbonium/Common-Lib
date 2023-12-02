@@ -6,11 +6,11 @@ void dummyResetCallback() {
 
 BufferedUart::BufferedUart(UART_HandleTypeDef* Core) :
     listening(false),
-    TxQue(CharBuffer()),
-    RxQue(CharBuffer()),
+    TxQue(),
     uart(Core),
     asyncResetCallback(dummyResetCallback),
-    resetCountLimit(0xFFFF) {
+    resetCountLimit(0xFFFF), 
+    RxQue() {
 }
 
 void BufferedUart::send(uint8_t* buf, uint16_t length) {

@@ -26,6 +26,15 @@ public:
     IbcPacket(IBCATTN attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data);
     IbcPacket(CharBuffer* buf);
     virtual ~IbcPacket();
+
+    // Delete copy constructor and copy assignment operator
+    IbcPacket(const IbcPacket&) = delete;
+    IbcPacket& operator=(const IbcPacket&) = delete;
+
+    // Delete move constructor and move assignment operator
+    IbcPacket(IbcPacket&&) = delete;
+    IbcPacket& operator=(IbcPacket&&) = delete;
+
     void queueInto(CharBuffer* buf);
     virtual bool process() { return false; }
 

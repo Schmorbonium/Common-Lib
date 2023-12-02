@@ -22,6 +22,15 @@ public:
     CharBuffer();
     ~CharBuffer();
 
+
+    // Delete copy constructor and copy assignment operator
+    CharBuffer(const CharBuffer&) = delete;
+    CharBuffer& operator=(const CharBuffer&) = delete;
+
+    // Delete move constructor and move assignment operator
+    CharBuffer(CharBuffer&&) = delete;
+    CharBuffer& operator=(CharBuffer&&) = delete;
+    
     // Append a new Character to the end of the buffer 
     void append(uint8_t c);
 
