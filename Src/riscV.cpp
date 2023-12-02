@@ -30,6 +30,7 @@ riscV::~riscV() {
 
 /*****************************************
  * MemoryOp Node
+ * Isaac
  *****************************************/
 MemoryOp::MemoryOp(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -41,6 +42,7 @@ bool MemoryOp::evaluate() {
 
 /*****************************************
  * RegisterWrite
+ * Daniel
  *****************************************/
 RegisterWrite::RegisterWrite(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -72,6 +74,7 @@ bool RegisterWrite::evaluate() {
 
 /*****************************************
  * NewPC
+ * Daniel
  *****************************************/
 NewPC::NewPC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -83,6 +86,7 @@ bool NewPC::evaluate() {
 
 /*****************************************
  * ALUOut
+ * Daniel
  *****************************************/
 ALUOut::ALUOut(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -94,6 +98,7 @@ bool ALUOut::evaluate() {
 
 /*****************************************
  * RegisterOutputs
+ * Daniel
  *****************************************/
 RegisterOutputs::RegisterOutputs(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -107,6 +112,7 @@ bool RegisterOutputs::evaluate() {
 
 /*****************************************
  * DecodedInstruction
+ * Alex
  *****************************************/
 DecodedInstruction::DecodedInstruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -118,6 +124,7 @@ bool DecodedInstruction::evaluate() {
 
 /*****************************************
  * Instruction
+ * Isaac
  *****************************************/
 Instruction::Instruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;
@@ -129,6 +136,7 @@ bool Instruction::evaluate() {
 
 /*****************************************
  * PC
+ * Alex
  *****************************************/
 PC::PC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
     this->processor = processor;

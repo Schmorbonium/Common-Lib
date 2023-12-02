@@ -4,9 +4,9 @@ class riscV;
 class PC : public IDependencyNode
 {
 private:
+    riscV* processor;
 public:
     uint32_t programCounter;
-    riscV* processor;
     bool evaluate();
     PC(DependencyTree* parent, riscV* processor);
     ~PC();
@@ -15,9 +15,9 @@ public:
 class Instruction : public IDependencyNode
 {
 private:
-    uint32_t instruction;
     riscV* processor;
 public:
+    uint32_t instruction;
     bool evaluate();
     Instruction(DependencyTree* parent, riscV* processor);
     ~Instruction();
@@ -26,8 +26,8 @@ public:
 class DecodedInstruction : public IDependencyNode
 {
 private:
-public:
     riscV* processor;
+public:
     uint32_t immediate_val;
     uint8_t regA_select;
     uint8_t regB_select;
@@ -50,9 +50,9 @@ class RegisterOutputs : public IDependencyNode
 {
 private:
     riscV* processor;
+public:
     uint32_t regA_value;
     uint32_t regB_value;
-public:
     bool evaluate();
     RegisterOutputs(DependencyTree* parent, riscV* processor);
     ~RegisterOutputs();
@@ -62,7 +62,6 @@ class ALUOut : public IDependencyNode
 {
 private:
     riscV* processor;
-    uint32_t programCounter;
 public:
     uint32_t output;
     bool evaluate();
@@ -74,8 +73,8 @@ class NewPC : public IDependencyNode
 {
 private:
     riscV* processor;
-    uint32_t programCounter;
 public:
+    uint32_t programCounter;
     bool evaluate();
     NewPC(DependencyTree* parent, riscV* processor);
     ~NewPC();
@@ -96,8 +95,8 @@ class MemoryOp : public IDependencyNode
 {
 private:
     riscV* processor;
-    uint32_t programCounter;
 public:
+    uint32_t programCounter;
     uint32_t dataOut;
     bool evaluate();
     MemoryOp(DependencyTree* parent, riscV* processor);
