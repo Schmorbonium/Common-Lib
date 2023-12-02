@@ -170,6 +170,55 @@ private:
     T* array[MAX_SIZE];
     uint16_t size;
 };
+
+template <typename T>
+class PriorityQueue {
+
+private:
+    struct Node {
+        T* data;
+        Node* next;
+
+        Node(T* d, Node* n = nullptr) : data(d), next(n) {}
+    };
+
+    Node* head;
+
+public:
+    PriorityQueue() : head(nullptr) {}
+
+    ~PriorityQueue() {
+        while (head != nullptr) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void enqueue(T* item) {
+        Node** curr = &head;
+        while (*curr != nullptr && (*curr)->data->getPriority() < item->getPriority()) {
+            curr = &(*curr)->next;
+        }
+        *curr = new Node(item, *curr);
+    }
+
+    T* dequeue() {
+        if (isEmpty()) {
+
+        }
+        Node* temp = head;
+        T* item = head->data;
+        head = head->next;
+        delete temp;
+        return item;
+    }
+
+    bool isEmpty() const {
+        return head == nullptr;
+    }
+};
+
 // Map Built on linked list
 // template<typename Key, typename Value>
 // class LinkedListMap {
