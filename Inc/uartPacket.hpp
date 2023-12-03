@@ -51,9 +51,8 @@ template <typename T, typename U>
 class Uart_Channel : public BufferedUart
 {
 private:
-    static const uint8_t startBitPattern = {0x0D, 0xDB, 0xA1, 0x15};
-    static const uint8_t startBitPatternLen = 4;
-
+    inline static const uint8_t startBitPatternLen = 4;
+    inline static const uint8_t startBitPattern[] = {0x0D, 0xDB, 0xA1, 0x15};
     bool parsingStartBitPattern = true;
     uint8_t NextPatternIndex = 0;
 
@@ -97,13 +96,13 @@ public:
         }
         else
         {
-            if (RxQue.getSize() <= 4)
+            if (RxQue.getSize() >= 4)
             {
-                return false;
+                uint16_t packetSize = RxQue.peak_uint16(2);
+                return (RxQue.getSize() >= (packetSize + 1)); // Has to have the checksum ready too
             }
-            uint16_t packetSize = RxQue.peak_uint16(2);
-            return (RxQue.getSize() >= (packetSize + 1)); // Has to have the checksum ready too
         }
+        return false;
     }
 
     void SendPacket(U *packetToSend)
@@ -113,12 +112,12 @@ public:
         {
             TxQue.append(startBitPattern[i]);
         }
-        
+
         // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
-        TxQue->setQueuedCheckSum(0);
+        TxQue.setQueuedCheckSum(0);
         this->send(packetToSend);
-        uint8_t checksum = TxQue->getQueuedCheckSum();
-        que->append(checksum);
+        uint8_t checksum = TxQue.getQueuedCheckSum();
+        TxQue.append(checksum);
     }
 
     bool processNextPacket()
