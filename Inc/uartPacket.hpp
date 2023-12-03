@@ -50,7 +50,6 @@ public:
 template <typename T, typename U>
 class Uart_Channel : public BufferedUart
 {
-
 public:
     virtual U *getNextPacket()
     {

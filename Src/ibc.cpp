@@ -62,6 +62,7 @@ void initIbc(UART_HandleTypeDef *huart, IbcResetCallback resetCallback, IBC_BOAR
     Global_iBCResetHandler = resetCallback;
     handler = new IBC_Channel(huart, boardID);
     handler->startListening();
+    handler->waitOnInit();
 }
 
 // void sendIbcPacket(uint8_t attn, uint8_t ttl, uint8_t len, IBCID id, uint8_t* data) {
