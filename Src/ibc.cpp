@@ -54,6 +54,7 @@ void processIbcInbox()
         default:
             break;
         }
+        delete nextPacket;
     }
 }
 
