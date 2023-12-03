@@ -26,29 +26,29 @@ class riscV;
 class PC : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t programCounter;
     bool evaluate();
-    PC(DependencyTree *parent, riscV *processor);
+    PC(DependencyTree* parent, riscV* processor);
     ~PC();
 };
 
 class Instruction : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t instruction;
     bool evaluate();
-    Instruction(DependencyTree *parent, riscV *processor);
+    Instruction(DependencyTree* parent, riscV* processor);
     ~Instruction();
 };
 
 class DecodedInstruction : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t immediate_val;
     uint8_t regA_select;
@@ -69,64 +69,65 @@ public:
     uint8_t funct3;
     
     bool evaluate();
-    DecodedInstruction(DependencyTree *parent, riscV *processor);
+    DecodedInstruction(DependencyTree* parent, riscV* processor);
     ~DecodedInstruction();
 };
 
 class RegisterOutputs : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t regA_value;
     uint32_t regB_value;
     bool evaluate();
-    RegisterOutputs(DependencyTree *parent, riscV *processor);
+    RegisterOutputs(DependencyTree* parent, riscV* processor);
     ~RegisterOutputs();
 };
 
 class ALUOut : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
-    uint32_t programCounter;
+    uint32_t output;
     bool evaluate();
-    ALUOut(DependencyTree *parent, riscV *processor);
+    ALUOut(DependencyTree* parent, riscV* processor);
     ~ALUOut();
 };
 
 class NewPC : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t programCounter;
     uint32_t pcPlus4;
     bool evaluate();
-    NewPC(DependencyTree *parent, riscV *processor);
+    NewPC(DependencyTree* parent, riscV* processor);
     ~NewPC();
 };
 
 class RegisterWrite : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
-    uint32_t programCounter;
+    uint32_t regs[16];
     bool evaluate();
-    RegisterWrite(DependencyTree *parent, riscV *processor);
+    RegisterWrite(DependencyTree* parent, riscV* processor);
     ~RegisterWrite();
 };
 
 class MemoryOp : public IDependencyNode
 {
 private:
-    riscV *processor;
+    riscV* processor;
 public:
     uint32_t programCounter;
+    uint32_t dataOut;
     bool evaluate();
-    MemoryOp(DependencyTree *parent, riscV *processor);
+    MemoryOp(DependencyTree* parent, riscV* processor);
     ~MemoryOp();
 };
 
