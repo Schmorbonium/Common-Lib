@@ -14,7 +14,7 @@ void processIbcInbox()
         switch (nextPacket->pktId.data)
         {
         case IBC_CMD_RESET:
-            if (handler->boardID != Reg_BoardId)
+            if (handler->boardID != MemIo_BoardId)
             {
                 handler->SendPacket(nextPacket);
             }
