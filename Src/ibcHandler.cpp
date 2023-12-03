@@ -53,6 +53,7 @@ void ContPkt::appendPayload(CharBuffer *que)
     aluOp.appendToQue(que);
     memOp.appendToQue(que);
     branch.appendToQue(que);
+    routing.appendToQue(que);
 }
 uint16_t ContPkt::getPayloadWireSize()
 {
