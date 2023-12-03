@@ -50,12 +50,19 @@ public:
 template <typename T, typename U>
 class Uart_Channel : public BufferedUart
 {
-public:
+private:
+    static const uint8_t startBitPattern = {0x0D, 0xDB, 0xA1, 0x15};
+    static const uint8_t startBitPatternLen = 4;
+
+    bool parsingStartBitPattern = true;
+    uint8_t NextPatternIndex = 0;
+
     virtual U *getNextPacket()
     {
         return new U(&RxQue);
     }
 
+public:
     Uart_Channel(UART_HandleTypeDef *Core) : BufferedUart(Core)
     {
     }
@@ -67,21 +74,50 @@ public:
 
     bool PacketReady()
     {
-        if (RxQue.getSize() <= 4)
+        if (parsingStartBitPattern)
         {
-            return false;
+            // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
+            while (RxQue.getSize() > 0)
+            {
+                uint8_t bufferHead = RxQue.pop();
+                if (bufferHead == startBitPattern[NextPatternIndex])
+                {
+                    NextPatternIndex++;
+                    if (NextPatternIndex >= startBitPatternLen)
+                    {
+                        parsingStartBitPattern = false;
+                        NextPatternIndex = 0;
+                    }
+                }
+                else
+                {
+                    NextPatternIndex = 0;
+                }
+            }
         }
-        uint16_t packetSize = RxQue.peak_uint16(2);
-        return (RxQue.getSize() >= packetSize);
+        else
+        {
+            if (RxQue.getSize() <= 4)
+            {
+                return false;
+            }
+            uint16_t packetSize = RxQue.peak_uint16(2);
+            return (RxQue.getSize() >= (packetSize + 1)); // Has to have the checksum ready too
+        }
     }
 
     void SendPacket(U *packetToSend)
     {
+        // Start by sending the startBitPatternBits
+        for (uint16_t i = 0; i < startBitPatternLen; i++)
+        {
+            TxQue.append(startBitPattern[i]);
+        }
+        
         // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
-        uint8_t oldVal = que->setQueuedCheckSum(0);
-
+        TxQue->setQueuedCheckSum(0);
         this->send(packetToSend);
-        uint8_t checksum = que->setQueuedCheckSum(oldVal);
+        uint8_t checksum = TxQue->getQueuedCheckSum();
         que->append(checksum);
     }
 
@@ -90,6 +126,7 @@ public:
         bool GoodPacket = false;
         uint8_t old = this->RxQue.setPoppedCheckSum(0);
         U *pkt = getNextPacket();
+        parsingStartBitPattern = true;
         uint8_t calcCheckSum = this->RxQue.setPoppedCheckSum(old);
         uint8_t readCheckSum = this->RxQue.pop();
         if (calcCheckSum == readCheckSum)
