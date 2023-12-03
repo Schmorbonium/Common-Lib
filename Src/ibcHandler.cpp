@@ -201,7 +201,8 @@ void IBC_Channel::waitOnInit()
                 if (RxQue.getSize() >= cmdLen)
                 {
                     RSTPkt resetCommand(&RxQue);
-                    resetCommand.actOnPkt();
+                    resetCommand.actOnPkt();                    
+                    this->SendPacket((IBC_Packet*)(&resetCommand));
                     this->initialized = true;
                 }
             }
