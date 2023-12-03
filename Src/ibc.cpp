@@ -5,7 +5,6 @@
 IBC_Channel *handler;
 IbcResetCallback Global_iBCResetHandler = NULL;
 
-
 void processIbcInbox()
 {
     while (handler->PacketReady())
@@ -99,3 +98,13 @@ __weak void gotRegData(bool regASrc, uint8_t regAIndex, uint32_t regAVal, bool r
 __weak void gotALUData(bool inASrc, bool inBSrc, uint8_t aluFlags, uint32_t aluOutVal)
 {
 }
+
+void sendContData(uint32_t inst, uint32_t pc, uint8_t aluOp, uint8_t memOp, uint8_t branch, uint8_t routing)
+{
+    ContPkt contPkt(inst,pc,aluOp,memOp,branch,routing);
+    handler->SendPacket((IBC_Packet*)(&contPkt));
+}
+
+void sendRegData(bool regASrc, uint8_t regAIndex, uint32_t regAVal, bool regBSrc, uint8_t regBIndex, uint32_t regBVal, bool regDestSrc, uint8_t regDestIndex, uint32_t regDest);
+
+void sendALUData(bool inASrc, bool inBSrc, uint8_t aluFlags, uint32_t aluOutVal);
