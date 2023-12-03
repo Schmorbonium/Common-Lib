@@ -200,6 +200,7 @@ void IBC_Channel::waitOnInit(){
                     {
                         RSTPkt resetCommand(&RxQue);
                         resetCommand.actOnPkt();
+                        this->initialized = true;
                     }
                 }
         }
