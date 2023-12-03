@@ -4,7 +4,6 @@
 
 #include "zHal.h"
 #include "uartData.hpp"
-
 template <typename T>
 class Uart_Packet : public ISendable, public PacketField
 {
@@ -51,10 +50,11 @@ template <typename T, typename U>
 class Uart_Channel : public BufferedUart
 {
 private:
-    inline static const uint8_t startBitPatternLen = 4;
-    inline static const uint8_t startBitPattern[] = {0x0D, 0xDB, 0xA1, 0x15};
-    bool parsingStartBitPattern = true;
-    uint8_t NextPatternIndex = 0;
+    uint8_t startBitPatternLen;
+    uint8_t startBitPattern[4];
+    bool parsingStartBitPattern;
+    uint8_t NextPatternIndex;
+    bool seenData;
 
     virtual U *getNextPacket()
     {
@@ -64,6 +64,14 @@ private:
 public:
     Uart_Channel(UART_HandleTypeDef *Core) : BufferedUart(Core)
     {
+        parsingStartBitPattern = true;
+        NextPatternIndex = 0;
+        startBitPatternLen = 4;
+        startBitPattern[0] = 0x0D;
+        startBitPattern[1] = 0xDB;
+        startBitPattern[2] = 0xA1;
+        startBitPattern[3] = 0x15;
+        seenData = false;
     }
 
     T peekCommand()
@@ -77,6 +85,10 @@ public:
         {
             // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
             volatile uint16_t queLen = RxQue.getSize();
+            if(queLen > 0){
+                queLen = queLen;
+                seenData = true;
+            }
             while (queLen > 0)
             {
                 queLen = RxQue.getSize();
