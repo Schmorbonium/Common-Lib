@@ -226,26 +226,13 @@ void IBC_Channel::waitOnInit()
     }
     else
     {
-        uint16_t tick = (HAL_GetTick() + 1000);
+        uint32_t tick = (HAL_GetTick() + 1000);
         while (!this->initialized)
         {
-            if (getInputSize() >= 4)
+            if (this->PacketReady())
             {
-                IBCCommand cmd = this->peekCommand();
-                if (cmd != IBC_CMD_RESET)
-                {
-                    RxQue.pop();
-                    continue;
-                }
-
-                uint16_t cmdLen = RxQue.peak_uint16(2);
-                if (RxQue.getSize() >= cmdLen)
-                {
-                    RSTPkt resetCommand(&RxQue);
-                    resetCommand.actOnPkt();
-                    this->SendPacket((IBC_Packet *)(&resetCommand));
-                    this->initialized = true;
-                }
+                this->processNextPacket();
+                this->initialized = true;
             }
             if ((HAL_GetTick() - tick) > 1000)
             {
