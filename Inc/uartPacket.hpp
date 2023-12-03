@@ -26,7 +26,7 @@ public:
     uint16_t getWireSize()
     {
         // The extra Byte at the end is a checksum for basic  packet verification
-        return getHeaderWireSize() + getPayloadWireSize() + 1;
+        return getHeaderWireSize() + getPayloadWireSize();
     }
     uint16_t getHeaderWireSize()
     {
@@ -39,15 +39,11 @@ public:
         this->pktLen.appendToQue(que);
     }
 
-    // Appends Entire Packet to the wire, this includes any data from the Children and finally a basic checksum appended in the end
+    // Appends Entire Packet to the wire, this includes any data from the Children
     void appendToQue(CharBuffer *que)
     {
-        // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
-        uint8_t oldVal = que->setQueuedCheckSum(0);
         this->appendHeader(que);
         this->appendPayload(que);
-        uint8_t checksum = que->setQueuedCheckSum(oldVal);
-        que->append(checksum);
     }
 };
 
@@ -81,7 +77,12 @@ public:
 
     void SendPacket(U *packetToSend)
     {
+        // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
+        uint8_t oldVal = que->setQueuedCheckSum(0);
+
         this->send(packetToSend);
+        uint8_t checksum = que->setQueuedCheckSum(oldVal);
+        que->append(checksum);
     }
 
     bool processNextPacket()
