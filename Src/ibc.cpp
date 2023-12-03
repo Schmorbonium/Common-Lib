@@ -1,6 +1,7 @@
 #include "ibc.h"
 #include "zHal.h"
 #include "ibcHandler.hpp"
+#include "InterruptController.h"
 
 IBC_Channel *handler;
 IbcResetCallback Global_iBCResetHandler = NULL;
@@ -54,7 +55,9 @@ void processIbcInbox()
         default:
             break;
         }
+        InterruptController_enter();
         delete nextPacket;
+        InterruptController_leave();
     }
 }
 
