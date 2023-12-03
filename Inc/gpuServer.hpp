@@ -15,7 +15,7 @@ class GPU_Server : public GPU_Channel
     {
         while (!initialized)
         {
-            if (getInputSize() > 4)
+            if (getInputSize() >= 4)
             {
                 GpuCommand cmd = this->peekCommand();
                 if (cmd != Cmd_ResetGpu)

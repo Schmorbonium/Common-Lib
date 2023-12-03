@@ -188,7 +188,7 @@ void IBC_Channel::waitOnInit()
     {
         while (!this->initialized)
         {
-            if (getInputSize() > 4)
+            if (getInputSize() >= 4)
             {
                 IBCCommand cmd = this->peekCommand();
                 if (cmd != IBC_CMD_RESET)
@@ -202,6 +202,7 @@ void IBC_Channel::waitOnInit()
                 {
                     RSTPkt resetCommand(&RxQue);
                     resetCommand.actOnPkt();
+                    this->SendPacket((IBC_Packet *)(&resetCommand));
                     this->initialized = true;
                 }
             }
@@ -212,9 +213,23 @@ void IBC_Channel::waitOnInit()
         uint16_t tick = (HAL_GetTick() + 1000);
         while (!this->initialized)
         {
-            if (this->PacketReady())
+            if (getInputSize() >= 4)
             {
-                this->processNextPacket();
+                IBCCommand cmd = this->peekCommand();
+                if (cmd != IBC_CMD_RESET)
+                {
+                    RxQue.pop();
+                    continue;
+                }
+
+                uint16_t cmdLen = RxQue.peak_uint16(2);
+                if (RxQue.getSize() >= cmdLen)
+                {
+                    RSTPkt resetCommand(&RxQue);
+                    resetCommand.actOnPkt();
+                    this->SendPacket((IBC_Packet *)(&resetCommand));
+                    this->initialized = true;
+                }
             }
             if ((HAL_GetTick() - tick) > 1000)
             {
