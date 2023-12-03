@@ -1,43 +1,45 @@
 #ifndef __CHAR_BUFFER__
 #define __CHAR_BUFFER__
 
-
-
 #include "zHal.h"
 
-class CharBuffer {
+class CharBuffer
+{
 private:
     static const uint16_t NODE_SIZE = 16;
-    struct Node {
+    struct Node
+    {
         uint8_t data[NODE_SIZE];
-        Node* next;
+        Node *next;
     };
     uint16_t size;
-    Node* head;
+    Node *head;
     uint16_t headIndex;
-    Node* tail;
+    Node *tail;
     uint16_t tailIndex;
+
+    uint8_t checkSumAppended = 0;
+    uint8_t checkSumPopped = 0;
 
 public:
     CharBuffer();
     ~CharBuffer();
 
-
     // Delete copy constructor and copy assignment operator
-    CharBuffer(const CharBuffer&) = delete;
-    CharBuffer& operator=(const CharBuffer&) = delete;
+    CharBuffer(const CharBuffer &) = delete;
+    CharBuffer &operator=(const CharBuffer &) = delete;
 
     // Delete move constructor and move assignment operator
-    CharBuffer(CharBuffer&&) = delete;
-    CharBuffer& operator=(CharBuffer&&) = delete;
-    
-    // Append a new Character to the end of the buffer 
+    CharBuffer(CharBuffer &&) = delete;
+    CharBuffer &operator=(CharBuffer &&) = delete;
+
+    // Append a new Character to the end of the buffer
     void append(uint8_t c);
 
-    // Append a new Character to the end of the buffer 
+    // Append a new Character to the end of the buffer
     void append_uint16(uint16_t c);
 
-    // Append a new Character to the end of the buffer 
+    // Append a new Character to the end of the buffer
     void append_uint32(uint32_t c);
 
     // Remove and return the first character in the buffer
@@ -52,7 +54,7 @@ public:
     // Peaks at the value at a given index
     uint8_t peak(uint16_t) const;
 
-    uint16_t peak_uint16(uint16_t) const; 
+    uint16_t peak_uint16(uint16_t) const;
     uint16_t peak_uint16() const;
     uint32_t peak_uint32() const;
 
@@ -67,7 +69,7 @@ public:
 
     // Print the contents of the buffer
     void print() const;
-};
 
+};
 
 #endif // End __CHAR_BUFFER__
