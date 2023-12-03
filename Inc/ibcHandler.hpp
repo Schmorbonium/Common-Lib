@@ -5,7 +5,6 @@
 #include "bufferedUart.hpp"
 #include "uartData.hpp"
 #include "uartPacket.hpp"
-#include "ibcPacket.hpp"
 #include "ibc.h"
 
 enum IBCCommand : uint16_t

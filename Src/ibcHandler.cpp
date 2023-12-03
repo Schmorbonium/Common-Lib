@@ -1,6 +1,5 @@
 #include "ibcHandler.hpp"
 #include "ibc.h"
-#include "ibcPacket.hpp"
 #include "InterruptController.h"
 
 extern IbcResetCallback Global_iBCResetHandler;
