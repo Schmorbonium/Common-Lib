@@ -123,10 +123,10 @@ public:
     bool processNextPacket()
     {
         bool GoodPacket = false;
-        uint8_t old = this->RxQue.setPoppedCheckSum(0);
+        this->RxQue.setPoppedCheckSum(0);
         U *pkt = getNextPacket();
         parsingStartBitPattern = true;
-        uint8_t calcCheckSum = this->RxQue.setPoppedCheckSum(old);
+        uint8_t calcCheckSum = this->RxQue.getPoppedCheckSum();
         uint8_t readCheckSum = this->RxQue.pop();
         if (calcCheckSum == readCheckSum)
         {

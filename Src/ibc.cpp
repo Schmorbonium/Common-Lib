@@ -10,54 +10,7 @@ void processIbcInbox()
 {
     while (handler->PacketReady())
     {
-        IBC_Packet *nextPacket = handler->getNextPacket();
-
-        switch (nextPacket->pktId.data)
-        {
-        case IBC_CMD_RESET:
-            if (handler->boardID != MemIo_BoardId)
-            {
-                handler->SendPacket(nextPacket);
-            }
-            nextPacket->actOnPkt();
-            break;
-        case IBC_CMD_CONT:
-            if (handler->boardID != Reg_BoardId)
-            {
-                handler->SendPacket(nextPacket);
-            }
-            else
-            {
-                nextPacket->actOnPkt();
-            }
-
-            break;
-        case IBC_CMD_ALU:
-            if (handler->boardID != Reg_BoardId)
-            {
-                handler->SendPacket(nextPacket);
-            }
-            else
-            {
-                nextPacket->actOnPkt();
-            }
-            break;
-        case IBC_CMD_REG:
-            if (handler->boardID != Reg_BoardId)
-            {
-                handler->SendPacket(nextPacket);
-            }
-            else
-            {
-                nextPacket->actOnPkt();
-            }
-            break;
-        default:
-            break;
-        }
-        InterruptController_enter();
-        delete nextPacket;
-        InterruptController_leave();
+        handler->processNextPacket();
     }
 }
 

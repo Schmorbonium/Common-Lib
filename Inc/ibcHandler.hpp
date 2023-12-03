@@ -98,12 +98,14 @@ public:
 // This will replace IbcHandler
 class IBC_Channel : public Uart_Channel<IBCCommand, IBC_Packet>
 {
+private:
     bool initialized = false;
+    IBC_Packet *getNextPacket();
+
 public:
     IBC_BOARD_ID_ENUM boardID;
     IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board);
-    IBC_Packet *getNextPacket();
-    void waitOnInit(); 
+    void waitOnInit();
 };
 
 #endif

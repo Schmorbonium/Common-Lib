@@ -3,6 +3,7 @@
 #include "InterruptController.h"
 
 extern IbcResetCallback Global_iBCResetHandler;
+extern IBC_Channel *handler;
 
 IBC_Packet::IBC_Packet(IBCCommand command) : Uart_Packet<IBCCommand>(command) {}
 IBC_Packet::IBC_Packet(CharBuffer *que) : Uart_Packet<IBCCommand>(que) {}
@@ -18,6 +19,11 @@ void RSTPkt::appendPayload(CharBuffer *que) {}
 uint16_t RSTPkt::getPayloadWireSize() { return 0; }
 bool RSTPkt::actOnPkt()
 {
+    if (handler->boardID != MemIo_BoardId)
+    {
+        handler->send(this);
+    }
+
     Global_iBCResetHandler();
     return true;
 }
@@ -60,7 +66,15 @@ uint16_t ContPkt::getPayloadWireSize()
 }
 bool ContPkt::actOnPkt()
 {
-    gotContData(inst.data, pc.data, aluOp.data, memOp.data, branch.data, routing.data);
+    if (handler->boardID != Cont_BoardId)
+    {
+        handler->send(this);
+    }
+    else
+    {
+
+        gotContData(inst.data, pc.data, aluOp.data, memOp.data, branch.data, routing.data);
+    }
     return true;
 }
 
@@ -95,9 +109,17 @@ uint16_t ALUPkt::getPayloadWireSize()
 }
 bool ALUPkt::actOnPkt()
 {
-    bool temp_inASrc = flags.getFlag(0);
-    bool temp_inBSrc = flags.getFlag(1);
-    gotALUData(temp_inASrc, temp_inBSrc, aluFlags.data, aluOutVal.data);
+    if (handler->boardID != Alu_BoardId)
+    {
+        handler->send(this);
+    }
+    else
+    {
+
+        bool temp_inASrc = flags.getFlag(0);
+        bool temp_inBSrc = flags.getFlag(1);
+        gotALUData(temp_inASrc, temp_inBSrc, aluFlags.data, aluOutVal.data);
+    }
     return true;
 }
 
@@ -149,11 +171,18 @@ uint16_t RegPkt::getPayloadWireSize()
 }
 bool RegPkt::actOnPkt()
 {
-    bool temp_regASrc = flags.getFlag(0);
-    bool temp_regBSrc = flags.getFlag(1);
-    bool temp_regDestSrc = flags.getFlag(2);
+    if (handler->boardID != Reg_BoardId)
+    {
+        handler->send(this);
+    }
+    else
+    {
+        bool temp_regASrc = flags.getFlag(0);
+        bool temp_regBSrc = flags.getFlag(1);
+        bool temp_regDestSrc = flags.getFlag(2);
 
-    gotRegData(temp_regASrc, regAIndex.data, regAVal.data, temp_regBSrc, regBIndex.data, regBVal.data, temp_regDestSrc, regDestIndex.data, regDestVal.data);
+        gotRegData(temp_regASrc, regAIndex.data, regAVal.data, temp_regBSrc, regBIndex.data, regBVal.data, temp_regDestSrc, regDestIndex.data, regDestVal.data);
+    }
     return true;
 }
 
@@ -188,23 +217,10 @@ void IBC_Channel::waitOnInit()
     {
         while (!this->initialized)
         {
-            if (getInputSize() >= 4)
+            if (this->PacketReady())
             {
-                IBCCommand cmd = this->peekCommand();
-                if (cmd != IBC_CMD_RESET)
-                {
-                    RxQue.pop();
-                    continue;
-                }
-
-                uint16_t cmdLen = RxQue.peak_uint16(2);
-                if (RxQue.getSize() >= cmdLen)
-                {
-                    RSTPkt resetCommand(&RxQue);
-                    resetCommand.actOnPkt();
-                    this->SendPacket((IBC_Packet *)(&resetCommand));
-                    this->initialized = true;
-                }
+                this->processNextPacket();
+                this->initialized = true;
             }
         }
     }

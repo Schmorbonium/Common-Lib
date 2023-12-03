@@ -53,22 +53,24 @@ enum GpuCommand : uint16_t
     Cmd_ResetGpu = 0xA5A5
 };
 
-class GPU_Packet :public Uart_Packet<GpuCommand>
+class GPU_Packet : public Uart_Packet<GpuCommand>
 {
 public:
-    GPU_Packet(GpuCommand command):Uart_Packet<GpuCommand>( command){}
-    GPU_Packet(CharBuffer *que):Uart_Packet<GpuCommand>(que){}
-    virtual ~GPU_Packet(){}
-    virtual bool actOnPkt(){return false;}
-    virtual void appendPayload(CharBuffer *que){}
-    virtual uint16_t getPayloadWireSize(){return 0;}
+    GPU_Packet(GpuCommand command) : Uart_Packet<GpuCommand>(command) {}
+    GPU_Packet(CharBuffer *que) : Uart_Packet<GpuCommand>(que) {}
+    virtual ~GPU_Packet() {}
+    virtual bool actOnPkt() { return false; }
+    virtual void appendPayload(CharBuffer *que) {}
+    virtual uint16_t getPayloadWireSize() { return 0; }
 };
 
 class GPU_Channel : public Uart_Channel<GpuCommand, GPU_Packet>
 {
+private:
+    GPU_Packet *getNextPacket();
+
 public:
     GPU_Channel(UART_HandleTypeDef *Core);
-    GPU_Packet *getNextPacket();
 };
 
 // Cmd_FrameID = 0x1,
