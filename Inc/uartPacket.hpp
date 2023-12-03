@@ -67,7 +67,7 @@ public:
 
     bool PacketReady()
     {
-        if (RxQue.getSize() < 4)
+        if (RxQue.getSize() <= 4)
         {
             return false;
         }
