@@ -182,40 +182,46 @@ IBC_Packet *IBC_Channel::getNextPacket()
     return new IBC_Packet(inputQue);
 }
 
-
-void IBC_Channel::waitOnInit(){
-    if(this->boardID != MemIo_BoardId){
-        while(!this->initialized){
+void IBC_Channel::waitOnInit()
+{
+    if (this->boardID != MemIo_BoardId)
+    {
+        while (!this->initialized)
+        {
             if (getInputSize() > 4)
+            {
+                IBCCommand cmd = this->peekCommand();
+                if (cmd != IBC_CMD_RESET)
                 {
-                    IBCCommand cmd = this->peekCommand();
-                    if (cmd != IBC_CMD_RESET)
-                    {
-                        RxQue.pop();
-                        continue;
-                    }
-
-                    uint16_t cmdLen = RxQue.peak_uint16(2);
-                    if (RxQue.getSize() >= cmdLen)
-                    {
-                        RSTPkt resetCommand(&RxQue);
-                        resetCommand.actOnPkt();
-                        this->initialized = true;
-                    }
+                    RxQue.pop();
+                    continue;
                 }
+
+                uint16_t cmdLen = RxQue.peak_uint16(2);
+                if (RxQue.getSize() >= cmdLen)
+                {
+                    RSTPkt resetCommand(&RxQue);
+                    resetCommand.actOnPkt();
+                    this->initialized = true;
+                }
+            }
         }
-    } else{
-        uint16_t tick = (HAL_GetTick()+1000);
-        while(!this->initialized){
-            if(this->PacketReady()){
+    }
+    else
+    {
+        uint16_t tick = (HAL_GetTick() + 1000);
+        while (!this->initialized)
+        {
+            if (this->PacketReady())
+            {
                 this->processNextPacket();
             }
-            if((HAL_GetTick() - tick )> 1000){
+            if ((HAL_GetTick() - tick) > 1000)
+            {
                 RSTPkt rstPkt = RSTPkt();
-                this->SendPacket((IBC_Packet*)(&rstPkt));
+                this->SendPacket((IBC_Packet *)(&rstPkt));
                 tick = HAL_GetTick();
             }
         }
     }
-
 }
