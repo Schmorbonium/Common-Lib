@@ -124,16 +124,8 @@ void CharBuffer::print() const
 
 void CharBuffer::append_uint16(uint16_t c)
 {
-    this->append(c & 0xFF);
     this->append((c >> 8) & 0xFF);
-}
-
-void CharBuffer::append_uint32(uint32_t c)
-{
     this->append(c & 0xFF);
-    this->append((c >> 8) & 0xFF);
-    this->append((c >> 16) & 0xFF);
-    this->append((c >> 24) & 0xFF);
 }
 
 uint16_t CharBuffer::pop_uint16()
@@ -142,6 +134,15 @@ uint16_t CharBuffer::pop_uint16()
     d |= this->pop() << 8;
     return d;
 }
+
+void CharBuffer::append_uint32(uint32_t c)
+{
+    this->append((c >> 24) & 0xFF);
+    this->append((c >> 16) & 0xFF);
+    this->append((c >> 8) & 0xFF);
+    this->append(c & 0xFF);
+}
+
 
 uint32_t CharBuffer::pop_uint32()
 {
