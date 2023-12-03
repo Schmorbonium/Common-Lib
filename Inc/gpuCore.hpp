@@ -60,7 +60,7 @@ public:
     GPU_Packet(CharBuffer *que):Uart_Packet<GpuCommand>(que){}
     virtual ~GPU_Packet(){}
     virtual bool actOnPkt(){return false;}
-    virtual void appendPayload(CharBuffer *que){}
+    virtual uint8_t appendPayload(CharBuffer *que){return 0;}
     virtual uint16_t getPayloadWireSize(){return 0;}
 };
 
@@ -79,7 +79,7 @@ public:
     FrameIdPkt(FrameID_t _FrameId);
     FrameIdPkt(CharBuffer *que);
     ~FrameIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -93,7 +93,7 @@ public:
     LutIdPkt(LutID_t LutId);
     LutIdPkt(CharBuffer *que);
     ~LutIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -107,7 +107,7 @@ public:
     SpriteIdPkt(SpriteID_t SpriteId);
     SpriteIdPkt(CharBuffer *que);
     ~SpriteIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -122,7 +122,7 @@ public:
     NewFramePkt(Width_t w, Height_t h);
     NewFramePkt(CharBuffer *que);
     ~NewFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -134,7 +134,7 @@ public:
     ~NewLutPkt();
     NewLutPkt();
     NewLutPkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -146,7 +146,7 @@ public:
     ~NewSpritePkt();
     NewSpritePkt();
     NewSpritePkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -159,7 +159,7 @@ public:
     ~LinkFramePkt();
     LinkFramePkt();
     LinkFramePkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -171,7 +171,7 @@ public:
     LinkMultiFramePkt();
     LinkMultiFramePkt(CharBuffer *que);
     ~LinkMultiFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -184,7 +184,7 @@ public:
     PlaceSpritePkt(uint16_t LutId);
     PlaceSpritePkt(CharBuffer *que);
     ~PlaceSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -196,7 +196,7 @@ public:
     AnimateSpritePkt();
     AnimateSpritePkt(CharBuffer *que);
     ~AnimateSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -209,7 +209,7 @@ public:
     MoveSpritePkt();
     MoveSpritePkt(CharBuffer *que);
     ~MoveSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -221,7 +221,7 @@ public:
     LoadFramePkt();
     LoadFramePkt(CharBuffer *que);
     ~LoadFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -234,7 +234,7 @@ public:
     LoadLutPkt(LutID_t LutId);
     LoadLutPkt(CharBuffer *que);
     ~LoadLutPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -247,7 +247,7 @@ public:
     FillBackGroundPkt(Color color);
     FillBackGroundPkt(CharBuffer *que);
     ~FillBackGroundPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -262,7 +262,7 @@ public:
     NewShapePkt(ShapeObj shapeData);
     NewShapePkt(CharBuffer *que);
     ~NewShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -276,7 +276,7 @@ public:
     SetShapePkt(uint16_t ShapeId, ShapeObj shapeData);
     SetShapePkt(CharBuffer *que);
     ~SetShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -288,7 +288,7 @@ public:
     MoveShapePkt(uint16_t LutId);
     MoveShapePkt(CharBuffer *que);
     ~MoveShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -310,7 +310,7 @@ public:
     GpuResetPkt(ResetType_Enum ResetType);
     GpuResetPkt(CharBuffer *que);
     ~GpuResetPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };

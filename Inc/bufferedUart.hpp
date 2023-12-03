@@ -9,7 +9,7 @@
 class ISendable
 {
 public:
-    virtual void appendToQue(CharBuffer *que){}
+    virtual uint8_t appendToQue(CharBuffer *que){return 0;}
     virtual uint16_t getWireSize() {return 0;}
 };
 

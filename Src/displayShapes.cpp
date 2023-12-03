@@ -15,7 +15,7 @@ ShapeObj::ShapeObj(CharBuffer *que)
       ShapeId(que),
       fillColor(que) {}
 
-void ShapeObj::appendShapeDataToQue(CharBuffer *que) {}
+uint8_t ShapeObj::appendShapeDataToQue(CharBuffer *que) {return 0;}
 uint16_t ShapeObj::GetShapeSize() { return 0; }
 
 uint16_t ShapeObj::getWireSize()
@@ -23,12 +23,14 @@ uint16_t ShapeObj::getWireSize()
     return shapeType.getWireSize() + ShapeId.getWireSize() + fillColor.getWireSize() + GetShapeSize();
 }
 
-void ShapeObj::appendToQue(CharBuffer *que)
+uint8_t ShapeObj::appendToQue(CharBuffer *que)
 {
-    shapeType.appendToQue(que);
-    ShapeId.appendToQue(que);
-    fillColor.appendToQue(que);
-    appendShapeDataToQue(que);
+    uint8_t checksum = 0;
+    checksum += shapeType.appendToQue(que);
+    checksum += ShapeId.appendToQue(que);
+    checksum += fillColor.appendToQue(que);
+    checksum += appendShapeDataToQue(que);
+    return checksum;
 }
 
 ShapeObj *ShapeObj::ParseFromWire(CharBuffer *que)
@@ -65,7 +67,7 @@ RectangleObj::RectangleObj(CharBuffer *que)
       w(que),
       h(que) {}
 
-void RectangleObj::appendShapeDataToQue(CharBuffer *que) {}
+uint8_t RectangleObj::appendShapeDataToQue(CharBuffer *que) {return 0;}
 uint16_t RectangleObj::GetShapeSize() { return 0; }
 BoundingBox_t RectangleObj::GetBoundingBox()
 {
@@ -84,11 +86,13 @@ CircleObj::CircleObj(uint16_t x, uint16_t y, uint16_t r, Color color)
     : ShapeObj(s_enum_circle, color), x(x), y(y), r(r) {}
 CircleObj::CircleObj(CharBuffer *que) : ShapeObj(que), x(que), y(que), r(que) {}
 
-void CircleObj::appendToQue(CharBuffer *que)
+uint8_t CircleObj::appendToQue(CharBuffer *que)
 {
-    x.appendToQue(que);
-    y.appendToQue(que);
-    r.appendToQue(que);
+    uint8_t checksum =0;
+    checksum += x.appendToQue(que);
+    checksum += y.appendToQue(que);
+    checksum += r.appendToQue(que);
+    return checksum;
 }
 
 BoundingBox_t CircleObj::GetBoundingBox()
@@ -107,11 +111,13 @@ void CircleObj::draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSi
 TriangleObj::TriangleObj(uint16_t x, uint16_t y, uint16_t r, Color color) : ShapeObj(s_enum_circle, color), x(x), y(y), r(r) {}
 TriangleObj::TriangleObj(CharBuffer *que) : ShapeObj(que), x(que), y(que), r(que) {}
 
-void TriangleObj::appendToQue(CharBuffer *que)
+uint8_t TriangleObj::appendToQue(CharBuffer *que)
 {
-    x.appendToQue(que);
-    y.appendToQue(que);
-    r.appendToQue(que);
+    uint8_t checksum =0;
+    checksum += x.appendToQue(que);
+    checksum += y.appendToQue(que);
+    checksum += r.appendToQue(que);
+    return checksum;
 }
 
 BoundingBox_t TriangleObj::GetBoundingBox()

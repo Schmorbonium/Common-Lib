@@ -2,15 +2,17 @@
 #ifndef __UART_PKT
 #define __UART_PKT
 
-
 #include "zHal.h"
 #include "uartData.hpp"
-
 
 template <typename T>
 class Uart_Packet : public ISendable, public PacketField
 {
+private:
 public:
+    static const uint32_t StartBitPattern = 0x0DDBA115;
+    static const uint8_t StartBitLength = 4;
+
     Uint16Field pktId;
     Uint16Field pktLen;
 
@@ -21,9 +23,9 @@ public:
     {
     }
 
-    virtual ~Uart_Packet(){}
-    virtual bool actOnPkt(){ return false;}
-    virtual void appendPayload(CharBuffer *que) {}
+    virtual ~Uart_Packet() {}
+    virtual bool actOnPkt() { return false; }
+    virtual uint8_t appendPayload(CharBuffer *que) {return 0;}
     virtual uint16_t getPayloadWireSize() { return 0; }
     uint16_t getWireSize()
     {
@@ -33,19 +35,22 @@ public:
     {
         return pktId.getWireSize() + pktLen.getWireSize();
     }
-    void appendHeader(CharBuffer *que)
+    uint8_t appendHeader(CharBuffer *que)
     {
-        this->pktId.appendToQue(que);
+        uint8_t checksum = 0;
+        checksum += this->pktId.appendToQue(que);
         this->pktLen.data = this->getWireSize();
-        this->pktLen.appendToQue(que);
+        checksum += this->pktLen.appendToQue(que);
+        return checksum;
     }
-    void appendToQue(CharBuffer *que)
+
+    uint8_t appendToQue(CharBuffer *que)
     {
-        this->appendHeader(que);
-        this->appendPayload(que);
+        uint8_t checksum = this->appendHeader(que);
+        checksum += this->appendPayload(que);
+        return checksum;
     }
 };
-
 
 template <typename T, typename U>
 class Uart_Channel : public BufferedUart
@@ -87,9 +92,6 @@ public:
         delete pkt;
         return true;
     }
-
 };
-
-
 
 #endif // __UART_PKT

@@ -32,13 +32,13 @@ public:
     CharBuffer& operator=(CharBuffer&&) = delete;
     
     // Append a new Character to the end of the buffer 
-    void append(uint8_t c);
+    uint8_t append(uint8_t c);
 
     // Append a new Character to the end of the buffer 
-    void append_uint16(uint16_t c);
+    uint8_t append_uint16(uint16_t c);
 
     // Append a new Character to the end of the buffer 
-    void append_uint32(uint32_t c);
+    uint8_t append_uint32(uint32_t c);
 
     // Remove and return the first character in the buffer
     uint8_t pop();

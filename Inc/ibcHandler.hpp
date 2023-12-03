@@ -23,7 +23,7 @@ public:
     IBC_Packet(CharBuffer *que);
     virtual ~IBC_Packet();
     virtual bool actOnPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
 };
 
@@ -34,7 +34,7 @@ public:
     RSTPkt();
     RSTPkt(CharBuffer *que);
     ~RSTPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -54,7 +54,7 @@ public:
     ContPkt(CharBuffer *que);
 
     ~ContPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -70,7 +70,7 @@ public:
     ALUPkt(bool inASrc, bool inBSrc, uint8_t aluFlags, uint32_t aluOutVal);
     ALUPkt(CharBuffer *que);
     ~ALUPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -90,7 +90,7 @@ public:
     RegPkt(bool regASrc, uint8_t regAIndex, uint32_t regAVal, bool regBSrc, uint8_t regBIndex, uint32_t regBVal, bool regDestSrc, uint8_t regDestIndex, uint32_t regDestVal);
     RegPkt(CharBuffer *que);
     ~RegPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual uint8_t appendPayload(CharBuffer *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };

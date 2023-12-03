@@ -244,11 +244,13 @@ uint16_t ColorField::getWireSize()
     return 3;
 }
 
-void ColorField::appendToQue(CharBuffer *que)
+uint8_t ColorField::appendToQue(CharBuffer *que)
 {
-    que->append(value.R);
-    que->append(value.G);
-    que->append(value.B);
+    uint8_t checksum = 0;
+    checksum += que->append(value.R);
+    checksum += que->append(value.G);
+    checksum += que->append(value.B);
+    return checksum;
 }
 
 Color ColorField::getColor() { return value; }

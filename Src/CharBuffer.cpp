@@ -9,7 +9,7 @@ CharBuffer::~CharBuffer()
 }
 
 // Add a character to the end of the buffer
-void CharBuffer::append(uint8_t c)
+uint8_t CharBuffer::append(uint8_t c)
 {
     InterruptController_enter();
     tailIndex++;
@@ -31,6 +31,7 @@ void CharBuffer::append(uint8_t c)
     tail->data[tailIndex] = c;
     size++;
     InterruptController_leave();
+    return c;
 }
 
 // Remove and return the first character in the buffer
@@ -122,35 +123,47 @@ void CharBuffer::print() const
     }
 }
 
-void CharBuffer::append_uint16(uint16_t c)
+uint8_t CharBuffer::append_uint16(uint16_t c)
 {
-    this->append((c >> 8) & 0xFF);
-    this->append(c & 0xFF);
+    uint8_t lsb = c & 0xFF;
+    uint8_t msb = (c >> 8) & 0xFF;
+    this->append(lsb);
+    this->append(msb);
+    return lsb + msb;
 }
 
 uint16_t CharBuffer::pop_uint16()
 {
-    uint16_t d = this->pop();
-    d |= this->pop() << 8;
-    return d;
+    uint16_t lsb = this->pop();
+    uint16_t msb = this->pop();
+    // uint16_t d = this->pop();
+    // d |= this->pop() << 8;
+    return lsb | (msb << 8);
 }
 
-void CharBuffer::append_uint32(uint32_t c)
+uint8_t CharBuffer::append_uint32(uint32_t c)
 {
-    this->append((c >> 24) & 0xFF);
-    this->append((c >> 16) & 0xFF);
-    this->append((c >> 8) & 0xFF);
-    this->append(c & 0xFF);
-}
+    uint8_t lsw_lsb = c & 0xFF;
+    uint8_t lsw_msb = (c >> 8) & 0xFF;
+    uint8_t msw_lsb = (c >> 16) & 0xFF;
+    uint8_t msw_msb = (c >> 24) & 0xFF;
 
+    this->append(lsw_lsb);
+    this->append(lsw_msb);
+    this->append(msw_lsb);
+    this->append(msw_msb);
+
+    return lsw_lsb + lsw_msb + msw_lsb + msw_msb;
+}
 
 uint32_t CharBuffer::pop_uint32()
 {
-    uint32_t d = this->pop();
-    d |= this->pop() << 8;
-    d |= this->pop() << 16;
-    d |= this->pop() << 24;
-    return d;
+    uint32_t lsw_lsb = this->pop();
+    uint32_t lsw_msb = this->pop();
+    uint32_t msw_lsb = this->pop();
+    uint32_t msw_msb = this->pop();
+
+    return lsw_lsb | (lsw_msb << 8)  | (msw_lsb<<16) | (msw_msb<<24);
 }
 
 uint16_t CharBuffer::peak_uint16() const

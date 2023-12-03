@@ -8,13 +8,13 @@ IBC_Packet::IBC_Packet(IBCCommand command) : Uart_Packet<IBCCommand>(command) {}
 IBC_Packet::IBC_Packet(CharBuffer *que) : Uart_Packet<IBCCommand>(que) {}
 IBC_Packet::~IBC_Packet() {}
 bool IBC_Packet::actOnPkt() { return false; }
-void IBC_Packet::appendPayload(CharBuffer *que) {}
+uint8_t IBC_Packet::appendPayload(CharBuffer *que) {return 0;}
 uint16_t IBC_Packet::getPayloadWireSize() { return 0; }
 
 RSTPkt::RSTPkt() : IBC_Packet(IBC_CMD_RESET) {}
 RSTPkt::RSTPkt(CharBuffer *que) : IBC_Packet(que) {}
 RSTPkt::~RSTPkt() {}
-void RSTPkt::appendPayload(CharBuffer *que) {}
+uint8_t RSTPkt::appendPayload(CharBuffer *que) {return 0;}
 uint16_t RSTPkt::getPayloadWireSize() { return 0; }
 bool RSTPkt::actOnPkt()
 {
@@ -45,14 +45,16 @@ ContPkt::ContPkt(CharBuffer *que) : IBC_Packet(que),
 ContPkt::~ContPkt()
 {
 }
-void ContPkt::appendPayload(CharBuffer *que)
+uint8_t ContPkt::appendPayload(CharBuffer *que)
 {
-    inst.appendToQue(que);
-    pc.appendToQue(que);
-    aluOp.appendToQue(que);
-    memOp.appendToQue(que);
-    branch.appendToQue(que);
-    routing.appendToQue(que);
+    uint8_t sum =0;
+    sum += inst.appendToQue(que);
+    sum += pc.appendToQue(que);
+    sum += aluOp.appendToQue(que);
+    sum += memOp.appendToQue(que);
+    sum += branch.appendToQue(que);
+    sum += routing.appendToQue(que);
+    return sum;
 }
 uint16_t ContPkt::getPayloadWireSize()
 {
@@ -83,11 +85,13 @@ ALUPkt::ALUPkt(CharBuffer *que)
 ALUPkt::~ALUPkt()
 {
 }
-void ALUPkt::appendPayload(CharBuffer *que)
+uint8_t ALUPkt::appendPayload(CharBuffer *que)
 {
-    flags.appendToQue(que);
-    aluFlags.appendToQue(que);
-    aluOutVal.appendToQue(que);
+    uint8_t sum = 0;
+    sum += flags.appendToQue(que);
+    sum += aluFlags.appendToQue(que);
+    sum += aluOutVal.appendToQue(que);
+    return sum;
 }
 uint16_t ALUPkt::getPayloadWireSize()
 {
@@ -127,15 +131,17 @@ RegPkt::RegPkt(CharBuffer *que)
 RegPkt::~RegPkt()
 {
 }
-void RegPkt::appendPayload(CharBuffer *que)
+uint8_t RegPkt::appendPayload(CharBuffer *que)
 {
-    flags.appendToQue(que);
-    regAIndex.appendToQue(que);
-    regAVal.appendToQue(que);
-    regBIndex.appendToQue(que);
-    regBVal.appendToQue(que);
-    regDestIndex.appendToQue(que);
-    regDestVal.appendToQue(que);
+    uint8_t sum =0;
+    sum += flags.appendToQue(que);
+    sum += regAIndex.appendToQue(que);
+    sum += regAVal.appendToQue(que);
+    sum += regBIndex.appendToQue(que);
+    sum += regBVal.appendToQue(que);
+    sum += regDestIndex.appendToQue(que);
+    sum += regDestVal.appendToQue(que);
+    return sum;
 }
 uint16_t RegPkt::getPayloadWireSize()
 {

@@ -20,7 +20,7 @@ class ShapeObj : public IDrawable, ISendable
 private:
 static IDManager ShapeIDManager;
 protected:
-    virtual void appendShapeDataToQue(CharBuffer *que);
+    virtual uint8_t appendShapeDataToQue(CharBuffer *que);
     virtual uint16_t GetShapeSize();
 public:
     Uint16Field shapeType;
@@ -32,7 +32,7 @@ public:
 
 
     uint16_t getWireSize();
-    void appendToQue(CharBuffer *que);
+    uint8_t appendToQue(CharBuffer *que);
     static ShapeObj *ParseFromWire(CharBuffer *que);
 };
 
@@ -45,7 +45,7 @@ public:
 
     RectangleObj(CharBuffer *que);
 
-    virtual void appendShapeDataToQue(CharBuffer *que);
+    virtual uint8_t appendShapeDataToQue(CharBuffer *que);
     virtual uint16_t GetShapeSize();
 
     virtual BoundingBox_t GetBoundingBox();
@@ -61,7 +61,7 @@ public:
     CircleObj(uint16_t x, uint16_t y, uint16_t r, Color color);
     CircleObj(CharBuffer *que);
 
-    virtual void appendToQue(CharBuffer *que);
+    virtual uint8_t appendToQue(CharBuffer *que);
     virtual BoundingBox_t GetBoundingBox();
     virtual void draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSize);
 };
@@ -75,7 +75,7 @@ public:
     TriangleObj(uint16_t x, uint16_t y, uint16_t r, Color color);
     TriangleObj(CharBuffer *que);
 
-    virtual void appendToQue(CharBuffer *que);
+    virtual uint8_t appendToQue(CharBuffer *que);
     virtual BoundingBox_t GetBoundingBox();
     virtual void draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSize);
 };

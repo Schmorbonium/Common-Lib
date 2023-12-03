@@ -15,7 +15,7 @@ protected:
 public:
     PacketField() {}
     virtual void parseFromQue(CharBuffer *que) {}
-    virtual void appendToQue(CharBuffer *que) {}
+    virtual uint8_t appendToQue(CharBuffer *que) {return 0;}
     virtual uint16_t getWireSize() { return 0; }
 };
 
@@ -26,7 +26,7 @@ public:
     Uint8Field(uint8_t data) : data(data) {}
     Uint8Field(CharBuffer *que) { parseFromQue(que); }
     virtual void parseFromQue(CharBuffer *que) { data = que->pop(); }
-    virtual void appendToQue(CharBuffer *que) { que->append(data); }
+    virtual uint8_t appendToQue(CharBuffer *que) { return que->append(data); }
     virtual uint16_t getWireSize() { return 1; }
 };
 
@@ -40,9 +40,9 @@ public:
     {
         data = que->pop_uint16();
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        que->append_uint16(data);
+        return que->append_uint16(data);
     }
     virtual uint16_t getWireSize() { return 2; }
 };
@@ -58,9 +58,9 @@ public:
     {
         data = que->pop_uint32();
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        que->append_uint32(data);
+        return que->append_uint32(data);
     }
     virtual uint16_t getWireSize() { return 4; }
 };
@@ -75,9 +75,9 @@ public:
     {
         que->pop();
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        que->append(0);
+        return que->append(0);
     }
     virtual uint16_t getWireSize() { return 1; }
 };
@@ -123,13 +123,14 @@ public:
         }
     }
 
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        len.appendToQue(que);
+        uint16_t checkSum = len.appendToQue(que);
         for (uint16_t i = 0; i < len.data; i++)
         {
-            que->append(string[i]);
+            checkSum += que->append(string[i]);
         }
+        return checkSum;
     }
     virtual uint16_t getWireSize() { return len.getWireSize() + len.data * 2; }
 };
@@ -172,13 +173,14 @@ public:
             data[i] = que->pop();
         }
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        len.appendToQue(que);
+        uint8_t checksum = len.appendToQue(que);
         for (uint16_t i = 0; i < len.data; i++)
         {
-            que->append(data[i]);
+            checksum += que->append(data[i]);
         }
+        return checksum;
     }
     virtual uint16_t getWireSize() { return len.getWireSize() + len.data * 1; }
 };
@@ -221,13 +223,14 @@ public:
             data[i] = que->pop_uint16();
         }
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        len.appendToQue(que);
+        uint8_t checkSum = len.appendToQue(que);
         for (uint16_t i = 0; i < len.data; i++)
         {
-            que->append_uint16(data[i]);
+            checkSum += que->append_uint16(data[i]);
         }
+        return checkSum;
     }
     virtual uint16_t getWireSize() { return len.getWireSize() + len.data * 2; }
 };
@@ -270,13 +273,14 @@ public:
             data[i] = que->pop_uint32();
         }
     }
-    virtual void appendToQue(CharBuffer *que)
+    virtual uint8_t appendToQue(CharBuffer *que)
     {
-        len.appendToQue(que);
+        uint8_t checksum = len.appendToQue(que);
         for (uint16_t i = 0; i < len.data; i++)
         {
-            que->append_uint32(data[i]);
+            checksum += que->append_uint32(data[i]);
         }
+        return checksum;
     }
     virtual uint16_t getWireSize() { return len.getWireSize() + len.data * 4; }
 };
