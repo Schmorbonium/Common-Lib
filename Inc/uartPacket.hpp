@@ -2,10 +2,8 @@
 #ifndef __UART_PKT
 #define __UART_PKT
 
-
 #include "zHal.h"
 #include "uartData.hpp"
-
 
 template <typename T>
 class Uart_Packet : public ISendable, public PacketField
@@ -21,13 +19,14 @@ public:
     {
     }
 
-    virtual ~Uart_Packet(){}
-    virtual bool actOnPkt(){ return false;}
+    virtual ~Uart_Packet() {}
+    virtual bool actOnPkt() { return false; }
     virtual void appendPayload(CharBuffer *que) {}
     virtual uint16_t getPayloadWireSize() { return 0; }
     uint16_t getWireSize()
     {
-        return getHeaderWireSize() + getPayloadWireSize();
+        // The extra Byte at the end is a checksum for basic  packet verification
+        return getHeaderWireSize() + getPayloadWireSize() + 1;
     }
     uint16_t getHeaderWireSize()
     {
@@ -39,13 +38,18 @@ public:
         this->pktLen.data = this->getWireSize();
         this->pktLen.appendToQue(que);
     }
+
+    // Appends Entire Packet to the wire, this includes any data from the Children and finally a basic checksum appended in the end
     void appendToQue(CharBuffer *que)
     {
+        // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
+        uint8_t oldVal = que->setQueuedCheckSum(0);
         this->appendHeader(que);
         this->appendPayload(que);
+        uint8_t checksum = que->setQueuedCheckSum(oldVal);
+        que->append(checksum);
     }
 };
-
 
 template <typename T, typename U>
 class Uart_Channel : public BufferedUart
@@ -87,9 +91,6 @@ public:
         delete pkt;
         return true;
     }
-
 };
-
-
 
 #endif // __UART_PKT
