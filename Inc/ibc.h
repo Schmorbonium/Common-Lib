@@ -7,6 +7,7 @@ extern "C"
 {
 #endif
 #include "zHal.h"
+#include <stdbool.h>
 
     typedef enum
     {
