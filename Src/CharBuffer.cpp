@@ -12,6 +12,7 @@ CharBuffer::~CharBuffer()
 void CharBuffer::append(uint8_t c)
 {
     InterruptController_enter();
+    checkSumAppended += c;
     tailIndex++;
     if (tail == nullptr || tailIndex == NODE_SIZE)
     {
@@ -42,6 +43,7 @@ uint8_t CharBuffer::pop()
         return 0;
         // throw std::out_of_range("Buffer is empty");
     }
+    
 
     char value = head->data[headIndex];
     headIndex++;
@@ -57,6 +59,7 @@ uint8_t CharBuffer::pop()
         delete temp;
         headIndex = 0;
     }
+    checkSumPopped += value;
     InterruptController_leave();
     return value;
 }
