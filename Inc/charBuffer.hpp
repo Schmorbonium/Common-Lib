@@ -70,6 +70,11 @@ public:
     // Print the contents of the buffer
     void print() const;
 
+    uint8_t getPoppedCheckSum();
+    uint8_t setPoppedCheckSum(uint8_t value);
+
+    uint8_t getQueuedCheckSum();
+    uint8_t setQueuedCheckSum(uint8_t value);
 };
 
 #endif // End __CHAR_BUFFER__

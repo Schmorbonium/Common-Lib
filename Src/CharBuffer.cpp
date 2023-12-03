@@ -143,7 +143,6 @@ void CharBuffer::append_uint32(uint32_t c)
     this->append(c & 0xFF);
 }
 
-
 uint32_t CharBuffer::pop_uint32()
 {
     uint32_t d = this->pop();
@@ -174,4 +173,28 @@ uint32_t CharBuffer::peak_uint32() const
     d |= this->peak(2) << 16;
     d |= this->peak(3) << 24;
     return d;
+}
+
+uint8_t CharBuffer::getPoppedCheckSum()
+{
+    return this->checkSumPopped;
+}
+
+uint8_t CharBuffer::setPoppedCheckSum(uint8_t newVal)
+{
+    uint8_t value = this->checkSumPopped;
+    this->checkSumPopped = newVal;
+    return value;
+}
+
+uint8_t CharBuffer::getQueuedCheckSum()
+{
+    return this->checkSumAppended;
+}
+
+uint8_t CharBuffer::setQueuedCheckSum(uint8_t newVal)
+{
+    uint8_t value = this->checkSumAppended;
+    this->checkSumAppended = newVal;
+    return value;
 }
