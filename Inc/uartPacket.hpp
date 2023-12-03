@@ -86,10 +86,19 @@ public:
 
     bool processNextPacket()
     {
+        bool GoodPacket = false;
+        uint8_t old = this->RxQue.setPoppedCheckSum(0);
         U *pkt = getNextPacket();
-        pkt->actOnPkt();
+        uint8_t calcCheckSum = this->RxQue.setPoppedCheckSum(old);
+        uint8_t readCheckSum = this->RxQue.pop();
+        if (calcCheckSum == readCheckSum)
+        {
+            pkt->actOnPkt();
+            GoodPacket = true;
+        }
+
         delete pkt;
-        return true;
+        return GoodPacket;
     }
 };
 
