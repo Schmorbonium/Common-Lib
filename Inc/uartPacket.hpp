@@ -76,8 +76,10 @@ public:
         if (parsingStartBitPattern)
         {
             // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
-            while (RxQue.getSize() > 0)
+            volatile uint16_t queLen = RxQue.getSize();
+            while (queLen > 0)
             {
+                queLen = RxQue.getSize();
                 uint8_t bufferHead = RxQue.pop();
                 if (bufferHead == startBitPattern[NextPatternIndex])
                 {
