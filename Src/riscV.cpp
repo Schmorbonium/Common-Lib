@@ -91,27 +91,27 @@ bool NewPC::evaluate()
         switch (processor->decodedInstruction.funct3)
         {
         case 0x0: // BEQ
-            if (processor->alu.out == 0) // branch true
+            if (processor->alu.output == 0) // branch true
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         case 0x1: // BNE
-            if (processor->alu.out != 0)
+            if (processor->alu.output != 0)
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         case 0x4: // BLT
-            if ((int32_t)processor->alu.out < 0)
+            if ((int32_t)processor->alu.output < 0)
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         case 0x5: // BGE
-            if ((int32_t)processor->alu.out > 0)
+            if ((int32_t)processor->alu.output > 0)
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         case 0x6: // BLTU
-            if ((int32_t)processor->alu.out < 0)
+            if ((int32_t)processor->alu.output < 0)
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         case 0x7:
-            if ((int32_t)processor->alu.out > 0)
+            if ((int32_t)processor->alu.output > 0)
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
         default:
