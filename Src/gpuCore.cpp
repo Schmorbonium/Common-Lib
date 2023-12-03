@@ -18,45 +18,6 @@
 #include "charBuffer.hpp"
 #include "uartData.hpp"
 
-
-
-
-// ------------------------------------- Core Packet Class -------------------------------------
-GPU_Packet::GPU_Packet(Command command) : pktId((uint16_t)command), pktLen((uint16_t)0)
-{
-}
-
-GPU_Packet::GPU_Packet(CharBuffer *que) : pktId(que), pktLen(que)
-{
-}
-
-bool GPU_Packet::actOnPkt() { return false; }
-void GPU_Packet::appendPayload(CharBuffer *que) {}
-uint16_t GPU_Packet::getPayloadWireSize() { return 0; }
-
-uint16_t GPU_Packet::getWireSize()
-{
-    return getHeaderWireSize() + getPayloadWireSize();
-}
-
-uint16_t GPU_Packet::getHeaderWireSize()
-{
-    return pktId.getWireSize() + pktLen.getWireSize();
-}
-
-void GPU_Packet::appendHeader(CharBuffer *que)
-{
-    this->pktId.appendToQue(que);
-    this->pktLen.data = this->getWireSize();
-    this->pktLen.appendToQue(que);
-}
-
-void GPU_Packet::appendToQue(CharBuffer *que)
-{
-    this->appendHeader(que);
-    this->appendPayload(que);
-}
-
 // ------------------------------------- Generic packet stuff -------------------------------------
 // Cmd_FrameID = 0x1,
 FrameIdPkt::FrameIdPkt(uint16_t _FrameId) : GPU_Packet(Cmd_FrameID), FrameId(_FrameId) {}
@@ -86,7 +47,8 @@ NewShapePkt::NewShapePkt(CharBuffer *que)
       shapeData(que) {}
 NewShapePkt::~NewShapePkt() {}
 
-void NewShapePkt::appendPayload(CharBuffer *que) {
+void NewShapePkt::appendPayload(CharBuffer *que)
+{
     shapeData.appendToQue(que);
 }
 uint16_t NewShapePkt::getPayloadWireSize() { return shapeData.getWireSize(); }
@@ -100,7 +62,7 @@ SetShapePkt::SetShapePkt(CharBuffer *que)
       shapeData(que) {}
 SetShapePkt::~SetShapePkt() {}
 void SetShapePkt::appendPayload(CharBuffer *que) {}
-uint16_t SetShapePkt::getPayloadWireSize() {return shapeData.getWireSize();}
+uint16_t SetShapePkt::getPayloadWireSize() { return shapeData.getWireSize(); }
 // Cmd_MoveShape,
 MoveShapePkt::MoveShapePkt(uint16_t LutId)
     : GPU_Packet(Cmd_SetShape) {}
@@ -108,7 +70,7 @@ MoveShapePkt::MoveShapePkt(CharBuffer *que)
     : GPU_Packet(que) {}
 MoveShapePkt::~MoveShapePkt() {}
 void MoveShapePkt::appendPayload(CharBuffer *que) {}
-uint16_t MoveShapePkt::getPayloadWireSize() {return 0;}
+uint16_t MoveShapePkt::getPayloadWireSize() { return 0; }
 
 FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
 FillBackGroundPkt::FillBackGroundPkt(CharBuffer *que) : GPU_Packet(que), fillColor(que) {}
@@ -130,35 +92,13 @@ void GpuResetPkt::appendPayload(CharBuffer *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
 // ------------------------------------- GPU Channel -------------------------------------
-GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : ctlUart(Core)
+GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel<GpuCommand, GPU_Packet>(Core)
 {
-}
-
-Command GPU_Channel::peekCommand()
-{
-    return (Command)ctlUart.RxQue.peak_uint16();
-}
-
-bool GPU_Channel::PacketReady()
-{
-    if (ctlUart.RxQue.getSize() < 4)
-    {
-        return false;
-    }
-    uint16_t packetSize = ctlUart.RxQue.peak_uint16(2);
-    return (ctlUart.RxQue.getSize() >= packetSize);
-}
-bool GPU_Channel::processNextPacket()
-{
-    GPU_Packet *pkt = getNextPacket();
-    pkt->actOnPkt();
-    delete pkt;
-    return true;
 }
 
 GPU_Packet *GPU_Channel::getNextPacket()
 {
-    CharBuffer *inputQue = &(this->ctlUart.RxQue);
+    CharBuffer *inputQue = &RxQue;
     switch (this->peekCommand())
     {
     case Cmd_FillBackGround:
@@ -166,15 +106,5 @@ GPU_Packet *GPU_Channel::getNextPacket()
     default:
         break;
     }
-    return new GPU_Packet(&ctlUart.RxQue);
-}
-
-void GPU_Channel::SendPacket(GPU_Packet *packetToSend)
-{
-    this->ctlUart.send(packetToSend);
-}
-
-void GPU_Channel::UartIRQHandler()
-{
-    this->ctlUart.uartHandler();
+    return new GPU_Packet(&RxQue);
 }

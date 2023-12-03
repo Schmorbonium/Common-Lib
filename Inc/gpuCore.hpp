@@ -19,6 +19,7 @@
 #include "bufferedUart.hpp"
 #include "charBuffer.hpp"
 #include "uartData.hpp"
+#include "uartPacket.hpp"
 #include "displayShapes.hpp"
 
 typedef uint16_t ShapeID_t;
@@ -30,7 +31,7 @@ typedef uint16_t PosY_t;
 typedef uint16_t Width_t;
 typedef uint16_t Height_t;
 
-enum Command : uint16_t
+enum GpuCommand : uint16_t
 {
     Cmd_FrameID = 0x1,
     Cmd_LutID,
@@ -52,37 +53,22 @@ enum Command : uint16_t
     Cmd_ResetGpu = 0xA5A5
 };
 
-class GPU_Packet : public ISendable, public PacketField
+class GPU_Packet :public Uart_Packet<GpuCommand>
 {
 public:
-    Uint16Field pktId;
-    Uint16Field pktLen;
-
-    GPU_Packet(Command command);
-    GPU_Packet(CharBuffer *que);
-    virtual ~GPU_Packet(){};
-    virtual bool actOnPkt();
-    virtual void appendPayload(CharBuffer *que);
-    virtual uint16_t getPayloadWireSize();
-    uint16_t getWireSize();
-    uint16_t getHeaderWireSize();
-    void appendHeader(CharBuffer *que);
-    void appendToQue(CharBuffer *que);
+    GPU_Packet(GpuCommand command):Uart_Packet<GpuCommand>( command){}
+    GPU_Packet(CharBuffer *que):Uart_Packet<GpuCommand>(que){}
+    virtual ~GPU_Packet(){}
+    virtual bool actOnPkt(){return false;}
+    virtual void appendPayload(CharBuffer *que){}
+    virtual uint16_t getPayloadWireSize(){return 0;}
 };
 
-class GPU_Channel
+class GPU_Channel : public Uart_Channel<GpuCommand, GPU_Packet>
 {
-protected:
-    BufferedUart ctlUart;
-
 public:
     GPU_Channel(UART_HandleTypeDef *Core);
-    Command peekCommand();
-    bool PacketReady();
     GPU_Packet *getNextPacket();
-    void SendPacket(GPU_Packet *packetToSend);
-    bool processNextPacket();
-    void UartIRQHandler();
 };
 
 // Cmd_FrameID = 0x1,
@@ -271,6 +257,7 @@ public:
 class NewShapePkt : public GPU_Packet
 {
     ShapeObj shapeData;
+
 public:
     NewShapePkt(ShapeObj shapeData);
     NewShapePkt(CharBuffer *que);
@@ -284,6 +271,7 @@ public:
 class SetShapePkt : public GPU_Packet
 {
     ShapeObj shapeData;
+
 public:
     SetShapePkt(uint16_t ShapeId, ShapeObj shapeData);
     SetShapePkt(CharBuffer *que);
