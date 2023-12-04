@@ -1,4 +1,5 @@
 #include "ringCharBuffer.hpp"
+#include "InterruptController.h"
 
 void RingCharBuffer::initNodes()
 {
@@ -86,10 +87,10 @@ RingCharBuffer::~RingCharBuffer()
     delete temp;
 }
 
-
 // Append a new Character to the end of the buffer
 void RingCharBuffer::append(uint8_t c)
 {
+    InterruptController_enter();
     if (this->headIndex >= NODE_SIZE)
     {
         advanceHead();
@@ -98,11 +99,13 @@ void RingCharBuffer::append(uint8_t c)
     headIndex++;
     size++;
     checkSumAppended += c;
+    InterruptController_leave();
 }
 
 // Remove and return the first character in the buffer
 uint8_t RingCharBuffer::pop()
 {
+    InterruptController_enter();
     if (this->tailIndex >= NODE_SIZE)
     {
         advanceTail();
@@ -111,6 +114,7 @@ uint8_t RingCharBuffer::pop()
     tailIndex++;
     size--;
     checkSumPopped += val;
+    InterruptController_leave();
     return val;
 }
 
@@ -150,11 +154,13 @@ bool RingCharBuffer::isEmpty() const
 // Clear the buffer and release memory
 void RingCharBuffer::clear()
 {
+    InterruptController_enter();
     while (tail != head)
     {
         advanceTail();
     }
     tailIndex = 0;
+    InterruptController_leave();
 }
 
 uint8_t RingCharBuffer::getPoppedCheckSum()
