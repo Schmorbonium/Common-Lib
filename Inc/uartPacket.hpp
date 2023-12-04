@@ -29,12 +29,14 @@ public:
 class Uart_Channel : public BufferedUart
 {
 private:
+    uint32_t startedWaitingAt;
     uint8_t startBitPatternLen;
     uint8_t startBitPattern[4];
     bool parsingStartBitPattern;
     uint8_t NextPatternIndex;
     bool seenData;
     virtual Uart_Packet *getNextPacket();
+
 public:
     Uart_Channel(UART_HandleTypeDef *Core);
     uint16_t peekCommand();

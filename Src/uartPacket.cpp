@@ -69,6 +69,7 @@ bool Uart_Channel::PacketReady()
                 NextPatternIndex += 1;
                 if (NextPatternIndex >= startBitPatternLen)
                 {
+                    startedWaitingAt = HAL_GetTick();
                     parsingStartBitPattern = false;
                     NextPatternIndex = 0;
                 }
@@ -83,6 +84,11 @@ bool Uart_Channel::PacketReady()
             if (RxQue.getSize() >= 4)
             {
                 uint16_t packetSize = RxQue.peak_uint16(2);
+                // Packets can max out at 100 that sounds good to me. :) Quite frankly I should probably use a timeout here
+                if (HAL_GetTick() - startedWaitingAt > 100)
+                {
+                    parsingStartBitPattern = true;
+                }
                 // Has to have the checksum ready too
                 return (RxQue.getSize() >= (packetSize + 1));
             }
