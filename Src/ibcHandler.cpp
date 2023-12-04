@@ -5,8 +5,8 @@
 extern IbcResetCallback Global_iBCResetHandler;
 extern IBC_Channel *handler;
 
-IBC_Packet::IBC_Packet(IBCCommand command) : Uart_Packet<IBCCommand>(command) {}
-IBC_Packet::IBC_Packet(CharBuffer *que) : Uart_Packet<IBCCommand>(que) {}
+IBC_Packet::IBC_Packet(IBCCommand command) : Uart_Packet(command) {}
+IBC_Packet::IBC_Packet(CharBuffer *que) : Uart_Packet(que) {}
 IBC_Packet::~IBC_Packet() {}
 bool IBC_Packet::actOnPkt() { return false; }
 void IBC_Packet::appendPayload(CharBuffer *que) {}
@@ -186,7 +186,7 @@ bool RegPkt::actOnPkt()
     return true;
 }
 
-IBC_Channel::IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board) : Uart_Channel<IBCCommand, IBC_Packet>(Core)
+IBC_Channel::IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board) : Uart_Channel(Core)
 {
     boardID = board;
 }

@@ -92,7 +92,7 @@ void GpuResetPkt::appendPayload(CharBuffer *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
 // ------------------------------------- GPU Channel -------------------------------------
-GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel<GpuCommand, GPU_Packet>(Core)
+GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel(Core)
 {
 }
 

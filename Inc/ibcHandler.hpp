@@ -16,7 +16,7 @@ enum IBCCommand : uint16_t
 };
 
 /// @brief This class is not intended to be used, so like dont.
-class IBC_Packet : public Uart_Packet<IBCCommand>
+class IBC_Packet : public Uart_Packet
 {
 public:
     IBC_Packet(IBCCommand command);
@@ -96,7 +96,7 @@ public:
 };
 
 // This will replace IbcHandler
-class IBC_Channel : public Uart_Channel<IBCCommand, IBC_Packet>
+class IBC_Channel : public Uart_Channel
 {
 private:
     bool initialized = false;

@@ -4,16 +4,16 @@
 // Static variable to keep track of the interrupt count
 static volatile uint16_t count = 0;
 
-static inline void blockInterrupts() {
+static void blockInterrupts() {
     __disable_irq();
 }
 
-static inline void unblockInterrupts() {
+static void unblockInterrupts() {
     __enable_irq();
 }
 
 // Enter sensitive area
-void inline InterruptController_enter() {
+void InterruptController_enter() {
     if (count == 0) {
         blockInterrupts();
     }
@@ -21,7 +21,7 @@ void inline InterruptController_enter() {
 }
 
 // Leave sensitive area
-void inline InterruptController_leave() {
+void InterruptController_leave() {
     if (count > 0) {
         count--;
         if (count == 0) {

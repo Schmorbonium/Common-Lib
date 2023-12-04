@@ -17,7 +17,7 @@ class GPU_Server : public GPU_Channel
         {
             if (getInputSize() >= 4)
             {
-                GpuCommand cmd = this->peekCommand();
+                GpuCommand cmd = (GpuCommand)this->peekCommand();
                 if (cmd != Cmd_ResetGpu)
                 {
                     RxQue.pop();
