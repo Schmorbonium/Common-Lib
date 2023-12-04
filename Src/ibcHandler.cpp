@@ -21,7 +21,7 @@ bool RSTPkt::actOnPkt()
 {
     if (handler->boardID != MemIo_BoardId)
     {
-        handler->send(this);
+        handler->SendPacket(this);
     }
 
     Global_iBCResetHandler();
