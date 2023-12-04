@@ -99,13 +99,14 @@ public:
 class IBC_Channel : public Uart_Channel
 {
 private:
-    bool initialized = false;
     IBC_Packet *getNextPacket();
+    bool initialized = false;
 
 public:
     IBC_BOARD_ID_ENUM boardID;
     IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board);
     void waitOnInit();
+    bool isInitialized();
 };
 
 #endif

@@ -72,8 +72,10 @@ bool ContPkt::actOnPkt()
     }
     else
     {
-
-        gotContData(inst.data, pc.data, aluOp.data, memOp.data, branch.data, routing.data);
+        if (handler->isInitialized())
+        {
+            gotContData(inst.data, pc.data, aluOp.data, memOp.data, branch.data, routing.data);
+        }
     }
     return true;
 }
@@ -115,10 +117,12 @@ bool ALUPkt::actOnPkt()
     }
     else
     {
-
-        bool temp_inASrc = flags.getFlag(0);
-        bool temp_inBSrc = flags.getFlag(1);
-        gotALUData(temp_inASrc, temp_inBSrc, aluFlags.data, aluOutVal.data);
+        if (handler->isInitialized())
+        {
+            bool temp_inASrc = flags.getFlag(0);
+            bool temp_inBSrc = flags.getFlag(1);
+            gotALUData(temp_inASrc, temp_inBSrc, aluFlags.data, aluOutVal.data);
+        }
     }
     return true;
 }
@@ -177,11 +181,14 @@ bool RegPkt::actOnPkt()
     }
     else
     {
-        bool temp_regASrc = flags.getFlag(0);
-        bool temp_regBSrc = flags.getFlag(1);
-        bool temp_regDestSrc = flags.getFlag(2);
+        if (handler->isInitialized())
+        {
+            bool temp_regASrc = flags.getFlag(0);
+            bool temp_regBSrc = flags.getFlag(1);
+            bool temp_regDestSrc = flags.getFlag(2);
 
-        gotRegData(temp_regASrc, regAIndex.data, regAVal.data, temp_regBSrc, regBIndex.data, regBVal.data, temp_regDestSrc, regDestIndex.data, regDestVal.data);
+            gotRegData(temp_regASrc, regAIndex.data, regAVal.data, temp_regBSrc, regBIndex.data, regBVal.data, temp_regDestSrc, regDestIndex.data, regDestVal.data);
+        }
     }
     return true;
 }
@@ -210,7 +217,10 @@ IBC_Packet *IBC_Channel::getNextPacket()
     }
     return new IBC_Packet(inputQue);
 }
-
+bool IBC_Channel::isInitialized()
+{
+    return this->initialized;
+}
 void IBC_Channel::waitOnInit()
 {
     if (this->boardID != MemIo_BoardId)
