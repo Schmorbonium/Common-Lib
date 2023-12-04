@@ -58,15 +58,15 @@ uint16_t Uart_Channel::peekCommand()
 
 bool Uart_Channel::PacketReady()
 {
-    if (parsingStartBitPattern)
+    while (RxQue.getSize() > 0)
     {
-        // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
-        if (RxQue.getSize() > 0)
+        if (parsingStartBitPattern)
         {
+            // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
             uint8_t bufferHead = RxQue.pop();
             if (bufferHead == startBitPattern[NextPatternIndex])
             {
-                NextPatternIndex+= 1;
+                NextPatternIndex += 1;
                 if (NextPatternIndex >= startBitPatternLen)
                 {
                     parsingStartBitPattern = false;
@@ -78,14 +78,14 @@ bool Uart_Channel::PacketReady()
                 NextPatternIndex = 0;
             }
         }
-    }
-    else
-    {
-        if (RxQue.getSize() >= 4)
+        else
         {
-            uint16_t packetSize = RxQue.peak_uint16(2);
-            // Has to have the checksum ready too
-            return (RxQue.getSize() >= (packetSize + 1)); 
+            if (RxQue.getSize() >= 4)
+            {
+                uint16_t packetSize = RxQue.peak_uint16(2);
+                // Has to have the checksum ready too
+                return (RxQue.getSize() >= (packetSize + 1));
+            }
         }
     }
     return false;
