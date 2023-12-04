@@ -127,55 +127,51 @@ void CharBuffer::print() const
 
 void CharBuffer::append_uint16(uint16_t c)
 {
-    this->append((c >> 8) & 0xFF);
-    this->append(c & 0xFF);
+    uint8_t lsb = c & 0xFF; 
+    uint8_t msb = (c >> 8) & 0xFF; 
+    this->append(msb);
+    this->append(lsb);
 }
 
 uint16_t CharBuffer::pop_uint16()
 {
-    uint16_t d = this->pop();
-    d |= this->pop() << 8;
-    return d;
-}
-
-void CharBuffer::append_uint32(uint32_t c)
-{
-    this->append((c >> 24) & 0xFF);
-    this->append((c >> 16) & 0xFF);
-    this->append((c >> 8) & 0xFF);
-    this->append(c & 0xFF);
-}
-
-uint32_t CharBuffer::pop_uint32()
-{
-    uint32_t d = this->pop();
-    d |= this->pop() << 8;
-    d |= this->pop() << 16;
-    d |= this->pop() << 24;
-    return d;
-}
-
-uint16_t CharBuffer::peak_uint16() const
-{
-    uint16_t d = this->peak(0);
-    d |= this->peak(1) << 8;
-    return d;
+    uint16_t lsb = this->pop();
+    uint16_t msb = this->pop();
+    return (lsb | (msb<<8));
 }
 
 uint16_t CharBuffer::peak_uint16(uint16_t startingIndex) const
 {
-    uint16_t d = this->peak(startingIndex);
-    d |= this->peak(startingIndex + 1) << 8;
-    return d;
+    uint16_t lsb = this->peak(startingIndex);
+    uint16_t msb = this->peak(startingIndex+1);
+    return (lsb | (msb<<8));
+}
+
+uint16_t CharBuffer::peak_uint16() const
+{
+    return peak_uint16(0);
+}
+
+void CharBuffer::append_uint32(uint32_t c)
+{
+    uint16_t lsW = c & 0xFFFF; 
+    uint16_t msW = (c >> 16) & 0xFFFF; 
+    this->append_uint16(lsW);
+    this->append_uint16(msW);
+}
+
+uint32_t CharBuffer::pop_uint32()
+{
+    uint32_t lsW = pop_uint16(); 
+    uint32_t msW = pop_uint16(); 
+    return (lsW | msW << 16);
 }
 
 uint32_t CharBuffer::peak_uint32() const
 {
-    uint32_t d = this->peak(0);
-    d |= this->peak(1) << 8;
-    d |= this->peak(2) << 16;
-    d |= this->peak(3) << 24;
-    return d;
+    uint16_t lsW = this->peak_uint16(0);
+    uint16_t msW = this->peak_uint16(2);
+    return (lsW | (msW<<16));
 }
 
 uint8_t CharBuffer::getPoppedCheckSum()

@@ -84,7 +84,8 @@ bool Uart_Channel::PacketReady()
         if (RxQue.getSize() >= 4)
         {
             uint16_t packetSize = RxQue.peak_uint16(2);
-            return (RxQue.getSize() >= (packetSize + 1)); // Has to have the checksum ready too
+            // Has to have the checksum ready too
+            return (RxQue.getSize() >= (packetSize + 1)); 
         }
     }
     return false;
