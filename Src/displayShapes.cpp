@@ -10,12 +10,12 @@ ShapeObj::ShapeObj(uint16_t shapeType, Color color)
 {
     // this->ShapeId.data = ShapeIDManager.allocateID();
 }
-ShapeObj::ShapeObj(CharBuffer *que)
+ShapeObj::ShapeObj(IQueue *que)
     : shapeType(que),
       ShapeId(que),
       fillColor(que) {}
 
-void ShapeObj::appendShapeDataToQue(CharBuffer *que) {}
+void ShapeObj::appendShapeDataToQue(IQueue *que) {}
 uint16_t ShapeObj::GetShapeSize() { return 0; }
 
 uint16_t ShapeObj::getWireSize()
@@ -23,7 +23,7 @@ uint16_t ShapeObj::getWireSize()
     return shapeType.getWireSize() + ShapeId.getWireSize() + fillColor.getWireSize() + GetShapeSize();
 }
 
-void ShapeObj::appendToQue(CharBuffer *que)
+void ShapeObj::appendToQue(IQueue *que)
 {
     shapeType.appendToQue(que);
     ShapeId.appendToQue(que);
@@ -31,7 +31,7 @@ void ShapeObj::appendToQue(CharBuffer *que)
     appendShapeDataToQue(que);
 }
 
-ShapeObj *ShapeObj::ParseFromWire(CharBuffer *que)
+ShapeObj *ShapeObj::ParseFromWire(IQueue *que)
 {
     uint16_t type = que->peak_uint16();
     switch (type)
@@ -58,14 +58,14 @@ RectangleObj::RectangleObj(uint16_t x, uint16_t y, uint16_t w, uint16_t h, Color
       w(w),
       h(h) {}
 
-RectangleObj::RectangleObj(CharBuffer *que)
+RectangleObj::RectangleObj(IQueue *que)
     : ShapeObj(que),
       x(que),
       y(que),
       w(que),
       h(que) {}
 
-void RectangleObj::appendShapeDataToQue(CharBuffer *que) {}
+void RectangleObj::appendShapeDataToQue(IQueue *que) {}
 uint16_t RectangleObj::GetShapeSize() { return 0; }
 BoundingBox_t RectangleObj::GetBoundingBox()
 {
@@ -82,9 +82,9 @@ void RectangleObj::draw(Color *colorBuffer, uint32_t StartIndex, uint32_t Reques
 
 CircleObj::CircleObj(uint16_t x, uint16_t y, uint16_t r, Color color)
     : ShapeObj(s_enum_circle, color), x(x), y(y), r(r) {}
-CircleObj::CircleObj(CharBuffer *que) : ShapeObj(que), x(que), y(que), r(que) {}
+CircleObj::CircleObj(IQueue *que) : ShapeObj(que), x(que), y(que), r(que) {}
 
-void CircleObj::appendToQue(CharBuffer *que)
+void CircleObj::appendToQue(IQueue *que)
 {
     x.appendToQue(que);
     y.appendToQue(que);
@@ -105,9 +105,9 @@ void CircleObj::draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSi
 }
 
 TriangleObj::TriangleObj(uint16_t x, uint16_t y, uint16_t r, Color color) : ShapeObj(s_enum_circle, color), x(x), y(y), r(r) {}
-TriangleObj::TriangleObj(CharBuffer *que) : ShapeObj(que), x(que), y(que), r(que) {}
+TriangleObj::TriangleObj(IQueue *que) : ShapeObj(que), x(que), y(que), r(que) {}
 
-void TriangleObj::appendToQue(CharBuffer *que)
+void TriangleObj::appendToQue(IQueue *que)
 {
     x.appendToQue(que);
     y.appendToQue(que);

@@ -3,13 +3,13 @@
 Uart_Packet::Uart_Packet(uint16_t command) : pktId(command), pktLen((uint16_t)0)
 {
 }
-Uart_Packet::Uart_Packet(CharBuffer *que) : pktId(que), pktLen(que)
+Uart_Packet::Uart_Packet(IQueue *que) : pktId(que), pktLen(que)
 {
 }
 
 Uart_Packet::~Uart_Packet() {}
 bool Uart_Packet::actOnPkt() { return false; }
-void Uart_Packet::appendPayload(CharBuffer *que) {}
+void Uart_Packet::appendPayload(IQueue *que) {}
 uint16_t Uart_Packet::getPayloadWireSize() { return 0; }
 uint16_t Uart_Packet::getWireSize()
 {
@@ -20,7 +20,7 @@ uint16_t Uart_Packet::getHeaderWireSize()
 {
     return pktId.getWireSize() + pktLen.getWireSize();
 }
-void Uart_Packet::appendHeader(CharBuffer *que)
+void Uart_Packet::appendHeader(IQueue *que)
 {
     this->pktId.appendToQue(que);
     this->pktLen.data = this->getWireSize();
@@ -28,7 +28,7 @@ void Uart_Packet::appendHeader(CharBuffer *que)
 }
 
 // Appends Entire Packet to the wire, this includes any data from the Children
-void Uart_Packet::appendToQue(CharBuffer *que)
+void Uart_Packet::appendToQue(IQueue *que)
 {
     this->appendHeader(que);
     this->appendPayload(que);

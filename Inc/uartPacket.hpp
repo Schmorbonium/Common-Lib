@@ -3,7 +3,9 @@
 #define __UART_PKT
 
 #include "zHal.h"
+#include "iQueue.hpp"
 #include "uartData.hpp"
+
 
 class Uart_Packet : public ISendable, public PacketField
 {
@@ -12,18 +14,18 @@ public:
     Uint16Field pktLen;
 
     Uart_Packet(uint16_t command);
-    Uart_Packet(CharBuffer *que);
+    Uart_Packet(IQueue *que);
 
     virtual ~Uart_Packet();
     virtual bool actOnPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     uint16_t getWireSize();
     uint16_t getHeaderWireSize();
-    void appendHeader(CharBuffer *que);
+    void appendHeader(IQueue *que);
 
     // Appends Entire Packet to the wire, this includes any data from the Children
-    void appendToQue(CharBuffer *que);
+    void appendToQue(IQueue *que);
 };
 
 class Uart_Channel : public BufferedUart

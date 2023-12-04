@@ -17,7 +17,7 @@
 // STATUS   PLACE_SPRITE(X,Y)
 // STATUS   ANIMATE_SPRITE(SPRITE_ID,AnimationRate) Sets the Sprite to automatically cycle though images. rate is a clock divider so higher is slower
 #include "bufferedUart.hpp"
-#include "charBuffer.hpp"
+#include "iQueue.hpp"
 #include "uartData.hpp"
 #include "uartPacket.hpp"
 #include "displayShapes.hpp"
@@ -57,10 +57,10 @@ class GPU_Packet : public Uart_Packet
 {
 public:
     GPU_Packet(GpuCommand command) : Uart_Packet(command) {}
-    GPU_Packet(CharBuffer *que) : Uart_Packet(que) {}
+    GPU_Packet(IQueue *que) : Uart_Packet(que) {}
     virtual ~GPU_Packet() {}
     virtual bool actOnPkt() { return false; }
-    virtual void appendPayload(CharBuffer *que) {}
+    virtual void appendPayload(IQueue *que) {}
     virtual uint16_t getPayloadWireSize() { return 0; }
 };
 
@@ -79,9 +79,9 @@ class FrameIdPkt : public GPU_Packet
 public:
     Uint16Field FrameId;
     FrameIdPkt(FrameID_t _FrameId);
-    FrameIdPkt(CharBuffer *que);
+    FrameIdPkt(IQueue *que);
     ~FrameIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -93,9 +93,9 @@ class LutIdPkt : public GPU_Packet
 public:
     Uint16Field LutId;
     LutIdPkt(LutID_t LutId);
-    LutIdPkt(CharBuffer *que);
+    LutIdPkt(IQueue *que);
     ~LutIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -107,9 +107,9 @@ class SpriteIdPkt : public GPU_Packet
 public:
     Uint16Field SpriteId;
     SpriteIdPkt(SpriteID_t SpriteId);
-    SpriteIdPkt(CharBuffer *que);
+    SpriteIdPkt(IQueue *que);
     ~SpriteIdPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -122,9 +122,9 @@ public:
     Uint16Field W;
     Uint16Field H;
     NewFramePkt(Width_t w, Height_t h);
-    NewFramePkt(CharBuffer *que);
+    NewFramePkt(IQueue *que);
     ~NewFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -135,8 +135,8 @@ class NewLutPkt : public GPU_Packet
 public:
     ~NewLutPkt();
     NewLutPkt();
-    NewLutPkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    NewLutPkt(IQueue *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -147,8 +147,8 @@ class NewSpritePkt : public GPU_Packet
 public:
     ~NewSpritePkt();
     NewSpritePkt();
-    NewSpritePkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    NewSpritePkt(IQueue *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -160,8 +160,8 @@ class LinkFramePkt : public GPU_Packet
 public:
     ~LinkFramePkt();
     LinkFramePkt();
-    LinkFramePkt(CharBuffer *que);
-    virtual void appendPayload(CharBuffer *que);
+    LinkFramePkt(IQueue *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -171,9 +171,9 @@ class LinkMultiFramePkt : public GPU_Packet
 {
 public:
     LinkMultiFramePkt();
-    LinkMultiFramePkt(CharBuffer *que);
+    LinkMultiFramePkt(IQueue *que);
     ~LinkMultiFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -184,9 +184,9 @@ class PlaceSpritePkt : public GPU_Packet
 public:
     Uint16Field LutId;
     PlaceSpritePkt(uint16_t LutId);
-    PlaceSpritePkt(CharBuffer *que);
+    PlaceSpritePkt(IQueue *que);
     ~PlaceSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -196,9 +196,9 @@ class AnimateSpritePkt : public GPU_Packet
 {
 public:
     AnimateSpritePkt();
-    AnimateSpritePkt(CharBuffer *que);
+    AnimateSpritePkt(IQueue *que);
     ~AnimateSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -209,9 +209,9 @@ class MoveSpritePkt : public GPU_Packet
 {
 public:
     MoveSpritePkt();
-    MoveSpritePkt(CharBuffer *que);
+    MoveSpritePkt(IQueue *que);
     ~MoveSpritePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -221,9 +221,9 @@ class LoadFramePkt : public GPU_Packet
 {
 public:
     LoadFramePkt();
-    LoadFramePkt(CharBuffer *que);
+    LoadFramePkt(IQueue *que);
     ~LoadFramePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -234,9 +234,9 @@ class LoadLutPkt : public GPU_Packet
 {
 public:
     LoadLutPkt(LutID_t LutId);
-    LoadLutPkt(CharBuffer *que);
+    LoadLutPkt(IQueue *que);
     ~LoadLutPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -247,9 +247,9 @@ class FillBackGroundPkt : public GPU_Packet
 public:
     ColorField fillColor;
     FillBackGroundPkt(Color color);
-    FillBackGroundPkt(CharBuffer *que);
+    FillBackGroundPkt(IQueue *que);
     ~FillBackGroundPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -262,9 +262,9 @@ class NewShapePkt : public GPU_Packet
 
 public:
     NewShapePkt(ShapeObj shapeData);
-    NewShapePkt(CharBuffer *que);
+    NewShapePkt(IQueue *que);
     ~NewShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -276,9 +276,9 @@ class SetShapePkt : public GPU_Packet
 
 public:
     SetShapePkt(uint16_t ShapeId, ShapeObj shapeData);
-    SetShapePkt(CharBuffer *que);
+    SetShapePkt(IQueue *que);
     ~SetShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -288,9 +288,9 @@ class MoveShapePkt : public GPU_Packet
 {
 public:
     MoveShapePkt(uint16_t LutId);
-    MoveShapePkt(CharBuffer *que);
+    MoveShapePkt(IQueue *que);
     ~MoveShapePkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     // Implement in client and server
     virtual bool actOnPkt();
@@ -310,9 +310,9 @@ class GpuResetPkt : public GPU_Packet
 public:
     Uint16Field ResetType;
     GpuResetPkt(ResetType_Enum ResetType);
-    GpuResetPkt(CharBuffer *que);
+    GpuResetPkt(IQueue *que);
     ~GpuResetPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };

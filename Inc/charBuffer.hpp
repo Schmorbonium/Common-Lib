@@ -2,9 +2,10 @@
 #define __CHAR_BUFFER__
 
 #include "zHal.h"
-#include "iBasicQue.hpp"
+#include "iQueue.hpp"
 
-class CharBuffer : public I_Basic_Que
+
+class CharBuffer : public IQueue
 {
 private:
     static const uint16_t NODE_SIZE = 64;

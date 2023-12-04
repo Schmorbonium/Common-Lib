@@ -2,7 +2,7 @@
 #include "zHal.h"
 #include "imageData.h"
 #include "lcd.hpp"
-#include "charBuffer.hpp"
+#include "iQueue.hpp"
 #include "bufferedUart.hpp"
 
 void LCD_Controller::writeCmdToLcd(uint8_t cmd)
@@ -232,7 +232,7 @@ void LCD_Controller::clearFrame(Color color)
 
 ColorField::ColorField(Color color) : value(color) {}
 
-ColorField::ColorField(CharBuffer *que)
+ColorField::ColorField(IQueue *que)
 {
     value.R = que->pop();
     value.G = que->pop();
@@ -244,7 +244,7 @@ uint16_t ColorField::getWireSize()
     return 3;
 }
 
-void ColorField::appendToQue(CharBuffer *que)
+void ColorField::appendToQue(IQueue *que)
 {
     que->append(value.R);
     que->append(value.G);

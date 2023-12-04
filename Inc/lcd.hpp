@@ -127,8 +127,8 @@ public:
     Color value;
     // Uint8Field r,g,b;
     ColorField(Color color);
-    ColorField(CharBuffer *que);
-    virtual void appendToQue(CharBuffer *que);
+    ColorField(IQueue *que);
+    virtual void appendToQue(IQueue *que);
     virtual uint16_t getWireSize();
     Color getColor();
 };

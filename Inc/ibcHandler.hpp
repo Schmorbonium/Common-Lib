@@ -20,10 +20,10 @@ class IBC_Packet : public Uart_Packet
 {
 public:
     IBC_Packet(IBCCommand command);
-    IBC_Packet(CharBuffer *que);
+    IBC_Packet(IQueue *que);
     virtual ~IBC_Packet();
     virtual bool actOnPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
 };
 
@@ -32,9 +32,9 @@ class RSTPkt : public IBC_Packet
 {
 public:
     RSTPkt();
-    RSTPkt(CharBuffer *que);
+    RSTPkt(IQueue *que);
     ~RSTPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -51,10 +51,10 @@ class ContPkt : public IBC_Packet
 
 public:
     ContPkt(uint32_t inst, uint32_t pc, uint8_t aluOp, uint8_t memOp, uint8_t branch, uint8_t routing);
-    ContPkt(CharBuffer *que);
+    ContPkt(IQueue *que);
 
     ~ContPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -68,9 +68,9 @@ class ALUPkt : public IBC_Packet
 
 public:
     ALUPkt(bool inASrc, bool inBSrc, uint8_t aluFlags, uint32_t aluOutVal);
-    ALUPkt(CharBuffer *que);
+    ALUPkt(IQueue *que);
     ~ALUPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
@@ -88,9 +88,9 @@ class RegPkt : public IBC_Packet
 
 public:
     RegPkt(bool regASrc, uint8_t regAIndex, uint32_t regAVal, bool regBSrc, uint8_t regBIndex, uint32_t regBVal, bool regDestSrc, uint8_t regDestIndex, uint32_t regDestVal);
-    RegPkt(CharBuffer *que);
+    RegPkt(IQueue *que);
     ~RegPkt();
-    virtual void appendPayload(CharBuffer *que);
+    virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };

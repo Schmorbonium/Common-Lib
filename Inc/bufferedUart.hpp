@@ -2,16 +2,10 @@
 #define __BUFFERED_UART__
 
 #include "zHal.h"
-#include "charBuffer.hpp"
+#include "iQueue.hpp"
+#include "ringCharBuffer.hpp"
 #include "ibc.h"
 
-
-class ISendable
-{
-public:
-    virtual void appendToQue(CharBuffer *que){}
-    virtual uint16_t getWireSize() {return 0;}
-};
 
 
 class BufferedUart
@@ -20,7 +14,7 @@ protected:
     bool listening;
     UART_HandleTypeDef* uart;
     bool sending;
-    CharBuffer TxQue;
+    RingCharBuffer TxQue;
     void startSending();
     void stopSending();
     bool pendingReadInterrupt();
@@ -29,7 +23,7 @@ protected:
     uint16_t resetCountLimit;
     uint16_t zeroCount;
 public:
-    CharBuffer RxQue;
+    RingCharBuffer RxQue;
     BufferedUart(UART_HandleTypeDef* Core);
     ~BufferedUart(){}
 

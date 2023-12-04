@@ -2,9 +2,9 @@
 #define __RING_CHAR_BUFFER__
 
 #include "zHal.h"
-#include "iBasicQue.hpp"
+#include "iQueue.hpp"
 
-class RingCharBuffer : public I_Basic_Que
+class RingCharBuffer : public IQueue
 {
 private:
     static const uint16_t NODE_SIZE = 64;

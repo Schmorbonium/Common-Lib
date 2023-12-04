@@ -1,6 +1,7 @@
 #ifndef __DispShape__
 #define __DispShape__
 #include "zHal.h"
+#include "iQueue.hpp"
 #include "lcd.hpp"
 #include "uartData.hpp"
 #include "isaacsTypes.hpp"
@@ -20,7 +21,7 @@ class ShapeObj : public IDrawable, ISendable
 private:
 static IDManager ShapeIDManager;
 protected:
-    virtual void appendShapeDataToQue(CharBuffer *que);
+    virtual void appendShapeDataToQue(IQueue *que);
     virtual uint16_t GetShapeSize();
 public:
     Uint16Field shapeType;
@@ -28,12 +29,12 @@ public:
     ColorField fillColor;
 
     ShapeObj(uint16_t shapeType, Color color);
-    ShapeObj(CharBuffer *que);
+    ShapeObj(IQueue *que);
 
 
     uint16_t getWireSize();
-    void appendToQue(CharBuffer *que);
-    static ShapeObj *ParseFromWire(CharBuffer *que);
+    void appendToQue(IQueue *que);
+    static ShapeObj *ParseFromWire(IQueue *que);
 };
 
 class RectangleObj : public ShapeObj
@@ -43,9 +44,9 @@ class RectangleObj : public ShapeObj
 public:
     RectangleObj(uint16_t x, uint16_t y, uint16_t w, uint16_t h, Color color);
 
-    RectangleObj(CharBuffer *que);
+    RectangleObj(IQueue *que);
 
-    virtual void appendShapeDataToQue(CharBuffer *que);
+    virtual void appendShapeDataToQue(IQueue *que);
     virtual uint16_t GetShapeSize();
 
     virtual BoundingBox_t GetBoundingBox();
@@ -59,9 +60,9 @@ class CircleObj : public ShapeObj
 
 public:
     CircleObj(uint16_t x, uint16_t y, uint16_t r, Color color);
-    CircleObj(CharBuffer *que);
+    CircleObj(IQueue *que);
 
-    virtual void appendToQue(CharBuffer *que);
+    virtual void appendToQue(IQueue *que);
     virtual BoundingBox_t GetBoundingBox();
     virtual void draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSize);
 };
@@ -73,9 +74,9 @@ class TriangleObj : public ShapeObj
 
 public:
     TriangleObj(uint16_t x, uint16_t y, uint16_t r, Color color);
-    TriangleObj(CharBuffer *que);
+    TriangleObj(IQueue *que);
 
-    virtual void appendToQue(CharBuffer *que);
+    virtual void appendToQue(IQueue *que);
     virtual BoundingBox_t GetBoundingBox();
     virtual void draw(Color *colorBuffer, uint32_t StartIndex, uint32_t RequestSize);
 };

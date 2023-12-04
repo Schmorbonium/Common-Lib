@@ -5,7 +5,7 @@
 #include "zHal.h"
 
 
-class I_Basic_Que
+class IQueue
 {
 public:
     virtual void append(uint8_t c);
@@ -28,4 +28,10 @@ public:
     uint32_t peak_uint32() const;
 };
 
+class ISendable
+{
+public:
+    virtual void appendToQue(IQueue *que);
+    virtual uint16_t getWireSize() ;
+};
 #endif

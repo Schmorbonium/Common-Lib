@@ -6,16 +6,16 @@ extern IbcResetCallback Global_iBCResetHandler;
 extern IBC_Channel *handler;
 
 IBC_Packet::IBC_Packet(IBCCommand command) : Uart_Packet(command) {}
-IBC_Packet::IBC_Packet(CharBuffer *que) : Uart_Packet(que) {}
+IBC_Packet::IBC_Packet(IQueue *que) : Uart_Packet(que) {}
 IBC_Packet::~IBC_Packet() {}
 bool IBC_Packet::actOnPkt() { return false; }
-void IBC_Packet::appendPayload(CharBuffer *que) {}
+void IBC_Packet::appendPayload(IQueue *que) {}
 uint16_t IBC_Packet::getPayloadWireSize() { return 0; }
 
 RSTPkt::RSTPkt() : IBC_Packet(IBC_CMD_RESET) {}
-RSTPkt::RSTPkt(CharBuffer *que) : IBC_Packet(que) {}
+RSTPkt::RSTPkt(IQueue *que) : IBC_Packet(que) {}
 RSTPkt::~RSTPkt() {}
-void RSTPkt::appendPayload(CharBuffer *que) {}
+void RSTPkt::appendPayload(IQueue *que) {}
 uint16_t RSTPkt::getPayloadWireSize() { return 0; }
 bool RSTPkt::actOnPkt()
 {
@@ -38,7 +38,7 @@ ContPkt::ContPkt(uint32_t inst, uint32_t pc, uint8_t aluOp, uint8_t memOp, uint8
       routing(routing)
 {
 }
-ContPkt::ContPkt(CharBuffer *que) : IBC_Packet(que),
+ContPkt::ContPkt(IQueue *que) : IBC_Packet(que),
                                     inst(que),
                                     pc(que),
                                     aluOp(que),
@@ -51,7 +51,7 @@ ContPkt::ContPkt(CharBuffer *que) : IBC_Packet(que),
 ContPkt::~ContPkt()
 {
 }
-void ContPkt::appendPayload(CharBuffer *que)
+void ContPkt::appendPayload(IQueue *que)
 {
     inst.appendToQue(que);
     pc.appendToQue(que);
@@ -89,7 +89,7 @@ ALUPkt::ALUPkt(bool inASrc, bool inBSrc, uint8_t aluFlags, uint32_t aluOutVal)
     flags.setFlag(0, inASrc);
     flags.setFlag(1, inBSrc);
 }
-ALUPkt::ALUPkt(CharBuffer *que)
+ALUPkt::ALUPkt(IQueue *que)
     : IBC_Packet(que),
       flags(que),
       aluFlags(que),
@@ -99,7 +99,7 @@ ALUPkt::ALUPkt(CharBuffer *que)
 ALUPkt::~ALUPkt()
 {
 }
-void ALUPkt::appendPayload(CharBuffer *que)
+void ALUPkt::appendPayload(IQueue *que)
 {
     flags.appendToQue(que);
     aluFlags.appendToQue(que);
@@ -138,7 +138,7 @@ RegPkt::RegPkt(bool regASrc, uint8_t regAIndex, uint32_t regAVal, bool regBSrc, 
       regDestVal(regDestVal)
 {
 }
-RegPkt::RegPkt(CharBuffer *que)
+RegPkt::RegPkt(IQueue *que)
     : IBC_Packet(que),
       flags(que),
       regAIndex(que),
@@ -153,7 +153,7 @@ RegPkt::RegPkt(CharBuffer *que)
 RegPkt::~RegPkt()
 {
 }
-void RegPkt::appendPayload(CharBuffer *que)
+void RegPkt::appendPayload(IQueue *que)
 {
     flags.appendToQue(que);
     regAIndex.appendToQue(que);
@@ -200,7 +200,7 @@ IBC_Channel::IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board) : Ua
 
 IBC_Packet *IBC_Channel::getNextPacket()
 {
-    CharBuffer *inputQue = &RxQue;
+    IQueue *inputQue = &RxQue;
     switch (this->peekCommand())
     {
     case IBC_CMD_RESET:
