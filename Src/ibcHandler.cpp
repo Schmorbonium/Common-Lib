@@ -68,7 +68,7 @@ bool ContPkt::actOnPkt()
 {
     if (handler->boardID != Cont_BoardId)
     {
-        handler->send(this);
+        handler->SendPacket(this);
     }
     else
     {
@@ -111,7 +111,7 @@ bool ALUPkt::actOnPkt()
 {
     if (handler->boardID != Alu_BoardId)
     {
-        handler->send(this);
+        handler->SendPacket(this);
     }
     else
     {
@@ -173,7 +173,7 @@ bool RegPkt::actOnPkt()
 {
     if (handler->boardID != Reg_BoardId)
     {
-        handler->send(this);
+        handler->SendPacket(this);
     }
     else
     {
