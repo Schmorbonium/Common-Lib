@@ -129,8 +129,8 @@ void CharBuffer::append_uint16(uint16_t c)
 {
     uint8_t lsb = c & 0xFF; 
     uint8_t msb = (c >> 8) & 0xFF; 
-    this->append(msb);
     this->append(lsb);
+    this->append(msb);
 }
 
 uint16_t CharBuffer::pop_uint16()
