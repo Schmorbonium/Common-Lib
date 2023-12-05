@@ -4,22 +4,19 @@
 #include "zHal.h"
 #include "iQueue.hpp"
 #include "ringCharBuffer.hpp"
+#include "iBufferedChannel.hpp"
 
-
-
-class BufferedUart
+class BufferedUart : public IBufferedChannel
 {
 protected:
     bool listening;
     UART_HandleTypeDef* uart;
     bool sending;
-    RingCharBuffer TxQue;
     void startSending();
     void stopSending();
     bool pendingReadInterrupt();
     bool pendingWriteInterrupt();
 public:
-    RingCharBuffer RxQue;
     BufferedUart(UART_HandleTypeDef* Core);
     ~BufferedUart(){}
 
@@ -31,14 +28,9 @@ public:
     BufferedUart(BufferedUart&&) = delete;
     BufferedUart& operator=(BufferedUart&&) = delete;
 
-    virtual void uartHandler();
+    virtual void asyncHandler();
     void startListening();
     void stopListening();
-    void send(uint8_t* buf, uint16_t length);
-    void send(ISendable* buf);
-    void takeFromInbox(uint8_t* buf, uint16_t size);
-    uint16_t getInputSize();
-    uint16_t getOutputSize();
 };
 
 
