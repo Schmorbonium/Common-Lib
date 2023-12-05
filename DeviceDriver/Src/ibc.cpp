@@ -4,7 +4,7 @@
 #include "InterruptController.h"
 
 IBC_Channel *handler;
-IbcResetCallback Global_iBCResetHandler = NULL;
+IbcResetCallback Global_iBCResetHandler = nullptr;
 
 void processIbcInbox()
 {
