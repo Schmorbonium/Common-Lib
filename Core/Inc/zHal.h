@@ -83,6 +83,9 @@ extern "C" {
 
 #include <cstdint>
 
+#define __disable_irq()
+#define __enable_irq()
+
 #endif 
 #ifdef __cplusplus
 }

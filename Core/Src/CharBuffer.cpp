@@ -113,7 +113,7 @@ void CharBuffer::clear()
 void CharBuffer::print() const
 {
     Node *current = head;
-    size_t currentIndex = 0;
+    uint16_t currentIndex = 0;
 
     while (current != nullptr)
     {
