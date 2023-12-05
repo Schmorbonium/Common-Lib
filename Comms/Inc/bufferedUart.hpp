@@ -4,7 +4,6 @@
 #include "zHal.h"
 #include "iQueue.hpp"
 #include "ringCharBuffer.hpp"
-#include "ibc.h"
 
 
 
@@ -19,9 +18,6 @@ protected:
     void stopSending();
     bool pendingReadInterrupt();
     bool pendingWriteInterrupt();
-    IbcResetCallback asyncResetCallback;
-    uint16_t resetCountLimit;
-    uint16_t zeroCount;
 public:
     RingCharBuffer RxQue;
     BufferedUart(UART_HandleTypeDef* Core);
@@ -43,8 +39,6 @@ public:
     void takeFromInbox(uint8_t* buf, uint16_t size);
     uint16_t getInputSize();
     uint16_t getOutputSize();
-    void setResetCallback(IbcResetCallback resetCallback);
-    void setResetCount(uint16_t count);
 };
 
 
