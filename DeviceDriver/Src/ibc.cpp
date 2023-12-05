@@ -42,7 +42,7 @@ uint32_t unpackData(uint8_t len, uint8_t *data)
 
 void usartIbcHandler()
 {
-    handler->uartHandler();
+    handler->asyncHandler();
 }
 
 __weak void gotContData(uint32_t inst, uint32_t pc, uint8_t aluOp, uint8_t memOp, uint8_t branch, uint8_t routing)
