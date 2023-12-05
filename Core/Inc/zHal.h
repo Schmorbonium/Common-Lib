@@ -77,6 +77,13 @@ extern "C" {
 
 #endif 
 
+
+// No MicroController target
+#if !defined(STM32F401xC) &&!defined(STM32F103xB) &&!defined(STM32F103x6) &&!defined(STM32F072xB) 
+
+#include <cstdint>
+
+#endif 
 #ifdef __cplusplus
 }
 #endif
