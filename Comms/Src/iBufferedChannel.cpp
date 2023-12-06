@@ -2,7 +2,9 @@
 
 void IBufferedChannel::startSending() {}
 void IBufferedChannel::stopSending() {}
-IBufferedChannel::IBufferedChannel() {}
+IBufferedChannel::IBufferedChannel() {
+    sending = false;
+}
 IBufferedChannel::~IBufferedChannel() {}
 void IBufferedChannel::startListening() {}
 void IBufferedChannel::stopListening() {}
@@ -20,11 +22,19 @@ void IBufferedChannel::send(uint8_t *buf, uint16_t length)
     {
         TxQue.append(buf[i]);
     }
+    if (sending == false)
+    {
+        startSending();
+    }
 }
 
 void IBufferedChannel::send(ISendable *buf)
 {
     buf->appendToQue(&this->TxQue);
+    if (sending == false)
+    {
+        startSending();
+    }
 }
 
 void IBufferedChannel::takeFromInbox(uint8_t *buf, uint16_t size)

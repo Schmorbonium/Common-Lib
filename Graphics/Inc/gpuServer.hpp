@@ -15,19 +15,19 @@ class GPU_Server : public GPU_Channel
     {
         while (!initialized)
         {
-            if (getInputSize() >= 4)
+            if (channel->getInputSize() >= 4)
             {
                 GpuCommand cmd = (GpuCommand)this->peekCommand();
                 if (cmd != Cmd_ResetGpu)
                 {
-                    RxQue.pop();
+                    channel->RxQue.pop();
                     continue;
                 }
 
-                uint16_t cmdLen = RxQue.peak_uint16(2);
-                if (RxQue.getSize() >= cmdLen)
+                uint16_t cmdLen = channel->RxQue.peak_uint16(2);
+                if (channel->RxQue.getSize() >= cmdLen)
                 {
-                    GpuResetPkt resetCommand(&RxQue);
+                    GpuResetPkt resetCommand(&channel->RxQue);
                     resetCommand.actOnPkt();
                 }
             }
@@ -36,7 +36,7 @@ class GPU_Server : public GPU_Channel
 
     void init()
     {
-        startListening();
+        channel->startListening();
         GpuResetPkt rstPkt(RST_init);
         this->SendPacket(&rstPkt);
         waitOnInit();

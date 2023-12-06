@@ -92,13 +92,13 @@ void GpuResetPkt::appendPayload(IQueue *que) { ResetType.appendToQue(que); }
 uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
 
 // ------------------------------------- GPU Channel -------------------------------------
-GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel(Core)
+GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel(new BufferedUart(Core))
 {
 }
 
 GPU_Packet *GPU_Channel::getNextPacket()
 {
-    IQueue *inputQue = &RxQue;
+    IQueue *inputQue = &channel->RxQue;
     switch (this->peekCommand())
     {
     case Cmd_FillBackGround:
@@ -106,5 +106,5 @@ GPU_Packet *GPU_Channel::getNextPacket()
     default:
         break;
     }
-    return new GPU_Packet(&RxQue);
+    return new GPU_Packet(&channel->RxQue);
 }

@@ -11,7 +11,6 @@ class BufferedUart : public IBufferedChannel
 protected:
     bool listening;
     UART_HandleTypeDef* uart;
-    bool sending;
     void startSending();
     void stopSending();
     bool pendingReadInterrupt();

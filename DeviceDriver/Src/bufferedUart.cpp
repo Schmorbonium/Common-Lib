@@ -1,8 +1,7 @@
 #include "bufferedUart.hpp"
 
 BufferedUart::BufferedUart(UART_HandleTypeDef *Core) : listening(false),
-                                                       uart(Core),
-                                                       sending(false)
+                                                       uart(Core)
 {
 }
 

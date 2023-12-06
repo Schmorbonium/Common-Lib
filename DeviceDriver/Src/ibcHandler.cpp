@@ -193,14 +193,14 @@ bool RegPkt::actOnPkt()
     return true;
 }
 
-IBC_Channel::IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board) : Uart_Channel(Core)
+IBC_Channel::IBC_Channel(UART_HandleTypeDef *Core, IBC_BOARD_ID_ENUM board) : Uart_Channel(new BufferedUart(Core))
 {
     boardID = board;
 }
 
 IBC_Packet *IBC_Channel::getNextPacket()
 {
-    IQueue *inputQue = &RxQue;
+    IQueue *inputQue = &this->channel->RxQue;
     switch (this->peekCommand())
     {
     case IBC_CMD_RESET:
