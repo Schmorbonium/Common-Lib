@@ -32,7 +32,7 @@ public:
     {
         clear();
     }
-    
+
     // Delete copy constructor and copy assignment operator
     Queue(const Queue&) = delete;
     Queue& operator=(const Queue&) = delete;
@@ -120,6 +120,153 @@ private:
     uint8_t tailIndex;
     uint8_t headIndex;
 };
+
+
+template <typename T>
+class ArrayList {
+public:
+    ArrayList() : size(0) {}
+
+    bool add(T* item) {
+        if (size < MAX_SIZE) {
+            array[size++] = item;
+            return true;
+        }
+        return false;
+    }
+
+    T* get(size_t index) const {
+        if (index < size) {
+            return array[index];
+        }
+        return nullptr;
+    }
+
+    bool remove(size_t index) {
+        if (index < size) {
+            for (size_t i = index; i < size - 1; ++i) {
+                array[i] = array[i + 1];
+            }
+            size--;
+            return true;
+        }
+        return false;
+    }
+
+    uint16_t getSize() const {
+        return size;
+    }
+
+    bool isFull() const {
+        return size == MAX_SIZE;
+    }
+
+    bool isEmpty() const {
+        return size == 0;
+    }
+
+private:
+    static const size_t MAX_SIZE = 4;
+    T* array[MAX_SIZE];
+    uint16_t size;
+};
+
+template <typename T>
+class PriorityQueue {
+
+private:
+    struct Node {
+        T* data;
+        Node* next;
+
+        Node(T* d, Node* n = nullptr) : data(d), next(n) {}
+    };
+
+    Node* head;
+
+public:
+    PriorityQueue() : head(nullptr) {}
+
+    ~PriorityQueue() {
+        while (head != nullptr) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void enqueue(T* item) {
+        Node** curr = &head;
+        while (*curr != nullptr && (*curr)->data->getPriority() < item->getPriority()) {
+            curr = &(*curr)->next;
+        }
+        *curr = new Node(item, *curr);
+    }
+
+    T* dequeue() {
+        if (isEmpty()) {
+
+        }
+        Node* temp = head;
+        T* item = head->data;
+        head = head->next;
+        delete temp;
+        return item;
+    }
+
+    bool isEmpty() const {
+        return head == nullptr;
+    }
+};
+
+// Map Built on linked list
+// template<typename Key, typename Value>
+// class LinkedListMap {
+// private:
+//     struct LinkListNode {
+//         Key key;
+//         Value value;
+//         LinkListNode* next;
+
+//         LinkListNode(const Key& k, const Value& v, LinkListNode* n) : key(k), value(v), next(n) {}
+//     };
+
+//     LinkListNode* head;
+
+// public:
+//     LinkedListMap() : head(nullptr) {}
+
+//     ~LinkedListMap() {
+//         Node* current = head;
+//         while (current != nullptr) {
+//             Node* temp = current;
+//             current = current->next;
+//             delete temp;
+//         }
+//     }
+
+//     void insert(const Key& key, const Value& value) {
+//         // If the Key is in the set update it
+//         for (Node* current = head; current != nullptr; current = current->next) {
+//             if (current->key == key) {
+//                 current->value = value;
+//                 return;
+//             }
+//         }
+//         // Otherwise we are adding it to the front of the list
+//         head = new Node(key, value, head);
+//     }
+
+//     Value* find(const Key& key) {
+//         for (Node* current = head; current != nullptr; current = current->next) {
+//             if (current->key == key) {
+//                 return &current->value;
+//             }
+//         }
+//         return nullptr;
+//     }
+// };
+
 
 //  ID Manager
 class IDManager {
