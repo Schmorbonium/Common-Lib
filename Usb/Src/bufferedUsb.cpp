@@ -21,8 +21,8 @@ BufferedUsb::BufferedUsb(const char *interfaceName)
     struct termios SerialPortSettings;
     tcgetattr(fd, &SerialPortSettings); // Get the current attributes of the Serial port
 
-    cfsetispeed(&SerialPortSettings, B115200); // Set Read Speed
-    cfsetospeed(&SerialPortSettings, B115200); // Set Write Speed
+    cfsetispeed(&SerialPortSettings, B1152000); // Set Read Speed
+    cfsetospeed(&SerialPortSettings, B1152000); // Set Write Speed
 
     SerialPortSettings.c_cflag &= ~PARENB; // No Parity
     SerialPortSettings.c_cflag &= ~CSTOPB; // Stop bits = 1
@@ -59,11 +59,11 @@ void BufferedUsb::stopListening()
 {
 }
 
-void BufferedUsb::startSending(){
-    
+void BufferedUsb::startSending()
+{
 }
-void BufferedUsb::stopSending(){
-    
+void BufferedUsb::stopSending()
+{
 }
 
 void BufferedUsb::asyncHandler()
