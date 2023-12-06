@@ -96,10 +96,11 @@ UsbReadWordRequest::~UsbReadWordRequest()
 void UsbReadWordRequest::appendPayload(IQueue *que)
 {
     Address.appendToQue(que);
+    PktCnt.appendToQue(que);
 }
 uint16_t UsbReadWordRequest::getPayloadWireSize()
 {
-    return Address.getWireSize();
+    return Address.getWireSize() + PktCnt.getWireSize();
 }
 
 UsbReadWordResponse::UsbReadWordResponse(uint32_t addr, uint32_t value, uint16_t PktCnt)
@@ -128,7 +129,7 @@ void UsbReadWordResponse::appendPayload(IQueue *que)
 
 uint16_t UsbReadWordResponse::getPayloadWireSize()
 {
-    return Address.getWireSize() + Value.getWireSize();
+    return Address.getWireSize() + Value.getWireSize() +PktCnt.getWireSize();
 }
 
 UsbPacket *UsbChannel::getNextPacket()
