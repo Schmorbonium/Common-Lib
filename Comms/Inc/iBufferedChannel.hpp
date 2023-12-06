@@ -16,7 +16,7 @@ public:
     RingCharBuffer TxQue;
     RingCharBuffer RxQue;
     IBufferedChannel();
-    ~IBufferedChannel();
+    virtual ~IBufferedChannel();
 
     // Delete copy constructor and copy assignment operator
     IBufferedChannel(const IBufferedChannel &) = delete;

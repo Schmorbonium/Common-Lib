@@ -2,10 +2,8 @@
 #ifndef __USB_Packets_
 #define __USB_Packets_
 
-#include "bufferedUart.hpp"
 #include "uartData.hpp"
 #include "uartPacket.hpp"
-#include "ibc.h"
 
 enum USBCommand : uint16_t
 {
