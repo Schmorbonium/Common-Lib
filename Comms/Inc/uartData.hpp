@@ -2,7 +2,6 @@
 #ifndef __UART_DATA
 #define __UART_DATA
 
-#include "bufferedUart.hpp"
 #include "iQueue.hpp"
 
 typedef uint32_t MemAddr_t;

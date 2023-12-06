@@ -5,6 +5,7 @@
 #include "zHal.h"
 #include "iQueue.hpp"
 #include "uartData.hpp"
+#include "iBufferedChannel.hpp"
 
 
 class Uart_Packet : public ISendable, public PacketField
@@ -28,7 +29,7 @@ public:
     void appendToQue(IQueue *que);
 };
 
-class Uart_Channel : public BufferedUart
+class Uart_Channel 
 {
 private:
     uint32_t startedWaitingAt;
@@ -40,7 +41,8 @@ private:
     virtual Uart_Packet *getNextPacket();
 
 public:
-    Uart_Channel(UART_HandleTypeDef *Core);
+    IBufferedChannel* channel;
+    Uart_Channel(IBufferedChannel *Core);
     uint16_t peekCommand();
     bool PacketReady();
     void SendPacket(ISendable *packetToSend);

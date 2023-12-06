@@ -36,10 +36,10 @@ void Uart_Packet::appendToQue(IQueue *que)
 
 Uart_Packet *Uart_Channel::getNextPacket()
 {
-    return new Uart_Packet(&RxQue);
+    return new Uart_Packet(&channel->RxQue);
 }
 
-Uart_Channel::Uart_Channel(UART_HandleTypeDef *Core) : BufferedUart(Core)
+Uart_Channel::Uart_Channel(IBufferedChannel *core) : channel(core)
 {
     parsingStartBitPattern = true;
     NextPatternIndex = 0;
@@ -53,17 +53,17 @@ Uart_Channel::Uart_Channel(UART_HandleTypeDef *Core) : BufferedUart(Core)
 
 uint16_t Uart_Channel::peekCommand()
 {
-    return RxQue.peak_uint16();
+    return channel->RxQue.peak_uint16();
 }
 
 bool Uart_Channel::PacketReady()
 {
-    while (RxQue.getSize() > 0)
+    while (channel->RxQue.getSize() > 0)
     {
         if (parsingStartBitPattern)
         {
             // Lets try to get the buffer as empty as possible, at any given time the head of the que should be some start bits and then a packet......
-            uint8_t bufferHead = RxQue.pop();
+            uint8_t bufferHead = channel->RxQue.pop();
             if (bufferHead == startBitPattern[NextPatternIndex])
             {
                 NextPatternIndex += 1;
@@ -81,16 +81,16 @@ bool Uart_Channel::PacketReady()
         }
         else
         {
-            if (RxQue.getSize() >= 4)
+            if (channel->RxQue.getSize() >= 4)
             {
-                uint16_t packetSize = RxQue.peak_uint16(2);
+                uint16_t packetSize = channel->RxQue.peak_uint16(2);
                 // Packets can max out at 100 that sounds good to me. :) Quite frankly I should probably use a timeout here
                 if (HAL_GetTick() - startedWaitingAt > 100)
                 {
                     parsingStartBitPattern = true;
                 }
                 // Has to have the checksum ready too
-                return (RxQue.getSize() >= (packetSize + 1));
+                return (channel->RxQue.getSize() >= (packetSize + 1));
             }
         }
     }
@@ -102,24 +102,24 @@ void Uart_Channel::SendPacket(ISendable *packetToSend)
     // Start by sending the startBitPatternBits
     for (uint16_t i = 0; i < startBitPatternLen; i++)
     {
-        TxQue.append(startBitPattern[i]);
+        channel->TxQue.append(startBitPattern[i]);
     }
 
     // TODO if Checksum is off sometimes, it may be because of interrupts? but I dont want to prevent interrupts until that happens though for good reasons... but I am too lazy to write them down right now so good luck. (Just ask me and ill tell you) -Isaac Christensen(2023)
-    TxQue.setQueuedCheckSum(0);
-    this->send(packetToSend);
-    uint8_t checksum = TxQue.getQueuedCheckSum();
-    TxQue.append(checksum);
+    channel->TxQue.setQueuedCheckSum(0);
+    channel->send(packetToSend);
+    uint8_t checksum = channel->TxQue.getQueuedCheckSum();
+    channel->TxQue.append(checksum);
 }
 
 bool Uart_Channel::processNextPacket()
 {
     bool GoodPacket = false;
-    this->RxQue.setPoppedCheckSum(0);
+    channel->RxQue.setPoppedCheckSum(0);
     Uart_Packet *pkt = getNextPacket();
     parsingStartBitPattern = true;
-    uint8_t calcCheckSum = this->RxQue.getPoppedCheckSum();
-    uint8_t readCheckSum = this->RxQue.pop();
+    uint8_t calcCheckSum = channel->RxQue.getPoppedCheckSum();
+    uint8_t readCheckSum = channel->RxQue.pop();
     if (calcCheckSum == readCheckSum)
     {
         pkt->actOnPkt();
