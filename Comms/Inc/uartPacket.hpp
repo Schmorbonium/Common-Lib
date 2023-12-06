@@ -32,7 +32,7 @@ public:
 class Uart_Channel 
 {
 private:
-    uint32_t startedWaitingAt;
+    uint64_t startedWaitingAt;
     uint8_t startBitPatternLen;
     uint8_t startBitPattern[4];
     bool parsingStartBitPattern;

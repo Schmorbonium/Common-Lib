@@ -81,6 +81,7 @@ extern "C"
 #if !defined(STM32F401xC) && !defined(STM32F103xB) && !defined(STM32F103x6) && !defined(STM32F072xB)
 
 #include <cstdint>
+#include <time.h>
 
 #define _ZHAL_UART_SET_TXI(uartHandle) /* testing */
 #define _ZHAL_UART_RESET_TXI(uartHandle) /* testing */
@@ -96,7 +97,7 @@ extern "C"
 
 #define __weak   __attribute__((weak))
 
-#define HAL_GetTick() 1
+#define HAL_GetTick() time(nullptr) 
 
 #define __disable_irq()
 #define __enable_irq()
