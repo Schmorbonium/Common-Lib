@@ -10,7 +10,9 @@ enum USBCommand : uint16_t
     USB_CMD_RESET_ENUM = 0x1,
     USB_CMD_BAD_REQUEST,
     USB_CMD_WORD_REQUEST,
-    USN_CMD_WORD_RESPONSE
+    USN_CMD_WORD_RESPONSE,
+    USB_CMD_WRITE_WORD_REQUEST,
+    USN_CMD_WRITE_WORD_RESPONSE
     // USB_CMD_PAGE_REQUEST,
     // USN_CMD_PAGE_RESPONSE,
 };
@@ -58,7 +60,7 @@ class UsbReadWordRequest : public UsbPacket
     Uint16Field PktCnt;
 
 public:
-    UsbReadWordRequest(uint32_t PageNumber,uint16_t PktCnt);
+    UsbReadWordRequest(uint32_t PageNumber, uint16_t PktCnt);
     UsbReadWordRequest(IQueue *que);
     ~UsbReadWordRequest();
     virtual void appendPayload(IQueue *que);
@@ -73,11 +75,73 @@ class UsbReadWordResponse : public UsbPacket
     Uint16Field PktCnt;
 
 public:
-    UsbReadWordResponse(uint32_t addr, uint32_t value,uint16_t PktCnt);
+    UsbReadWordResponse(uint32_t addr, uint32_t value, uint16_t PktCnt);
     UsbReadWordResponse(IQueue *que);
     ~UsbReadWordResponse();
     virtual void appendPayload(IQueue *que);
     virtual uint16_t getPayloadWireSize();
+    virtual bool actOnPkt();
+};
+
+class UsbWriteWordRequest : public UsbPacket
+{
+    Uint32Field Address;
+    Uint32Field Value;
+    Uint16Field PktCnt;
+
+public:
+    UsbWriteWordRequest(uint32_t addr, uint32_t value, uint16_t PktCnt)
+        : UsbPacket(USB_CMD_WRITE_WORD_REQUEST),
+          Address(Address),
+          Value(value),
+          PktCnt(PktCnt) {}
+    UsbWriteWordRequest(IQueue *que)
+        : UsbPacket(que),
+          Address(que),
+          Value(que),
+          PktCnt(que) {}
+    ~UsbWriteWordRequest();
+    virtual void appendPayload(IQueue *que)
+    {
+        Address.appendToQue(que);
+        Value.appendToQue(que);
+        PktCnt.appendToQue(que);
+    }
+    virtual uint16_t getPayloadWireSize()
+    {
+        return Address.getWireSize() + Value.getWireSize() + PktCnt.getWireSize();
+    }
+    virtual bool actOnPkt();
+};
+
+class UsbWriteWordResponse : public UsbPacket
+{
+    Uint32Field Address;
+    Uint16Field PktCnt;
+
+public:
+    UsbWriteWordResponse(uint32_t addr, uint16_t PktCnt)
+    : UsbPacket(USN_CMD_WRITE_WORD_RESPONSE),
+    Address(addr),
+    PktCnt(PktCnt)
+    {
+
+    }
+    UsbWriteWordResponse(IQueue *que)
+    : UsbPacket(que),
+    Address(que),
+    PktCnt(que)
+    {
+
+    }
+    ~UsbWriteWordResponse(){}
+    virtual void appendPayload(IQueue *que){
+        Address.appendToQue(que);
+        PktCnt.appendToQue(que);
+    }
+    virtual uint16_t getPayloadWireSize(){
+        return Address.getWireSize() + PktCnt.getWireSize();
+    }
     virtual bool actOnPkt();
 };
 

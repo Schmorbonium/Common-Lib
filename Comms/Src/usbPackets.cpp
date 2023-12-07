@@ -129,7 +129,54 @@ void UsbReadWordResponse::appendPayload(IQueue *que)
 
 uint16_t UsbReadWordResponse::getPayloadWireSize()
 {
-    return Address.getWireSize() + Value.getWireSize() +PktCnt.getWireSize();
+    return Address.getWireSize() + Value.getWireSize() + PktCnt.getWireSize();
+}
+
+UsbWriteWordRequest::UsbWriteWordRequest(uint32_t addr, uint32_t value, uint16_t PktCnt)
+    : UsbPacket(USB_CMD_WRITE_WORD_REQUEST),
+      Address(Address),
+      Value(value),
+      PktCnt(PktCnt) {}
+UsbWriteWordRequest::UsbWriteWordRequest(IQueue *que)
+    : UsbPacket(que),
+      Address(que),
+      Value(que),
+      PktCnt(que) {}
+UsbWriteWordRequest::~UsbWriteWordRequest()
+{
+}
+void UsbWriteWordRequest::appendPayload(IQueue *que)
+{
+    Address.appendToQue(que);
+    Value.appendToQue(que);
+    PktCnt.appendToQue(que);
+}
+uint16_t UsbWriteWordRequest::getPayloadWireSize()
+{
+    return Address.getWireSize() + Value.getWireSize() + PktCnt.getWireSize();
+}
+
+UsbWriteWordResponse::UsbWriteWordResponse(uint32_t addr, uint16_t PktCnt)
+    : UsbPacket(USN_CMD_WRITE_WORD_RESPONSE),
+      Address(addr),
+      PktCnt(PktCnt)
+{
+}
+UsbWriteWordResponse::UsbWriteWordResponse(IQueue *que)
+    : UsbPacket(que),
+      Address(que),
+      PktCnt(que)
+{
+}
+UsbWriteWordResponse::~UsbWriteWordResponse() {}
+void UsbWriteWordResponse::appendPayload(IQueue *que)
+{
+    Address.appendToQue(que);
+    PktCnt.appendToQue(que);
+}
+uint16_t UsbWriteWordResponse::getPayloadWireSize()
+{
+    return Address.getWireSize() + PktCnt.getWireSize();
 }
 
 UsbPacket *UsbChannel::getNextPacket()
@@ -144,13 +191,16 @@ UsbPacket *UsbChannel::getNextPacket()
         return (new UsbReadWordRequest(&this->channel->RxQue));
     case USN_CMD_WORD_RESPONSE:
         return (new UsbReadWordResponse(&this->channel->RxQue));
+    case USB_CMD_WRITE_WORD_REQUEST:
+        return (new UsbWriteWordRequest(&this->channel->RxQue));
+    case USN_CMD_WRITE_WORD_RESPONSE:
+        return (new UsbWriteWordResponse(&this->channel->RxQue));
     default:
         return (new UsbPacket(&this->channel->RxQue));
     }
 }
 
-
 UsbChannel::UsbChannel(IBufferedChannel *Core)
-:Uart_Channel(Core)
+    : Uart_Channel(Core)
 {
 }
