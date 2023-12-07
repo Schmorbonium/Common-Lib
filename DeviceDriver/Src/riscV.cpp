@@ -308,6 +308,27 @@ bool DecodedInstruction::evaluate()
         regWriteEnable = true;
         aluOp = IBC_ALUOP_ADD;
         memReadEnable = true;
+        switch (funct3)
+        {
+        case 0x0:
+            memOpSize = BYTE;
+            break;
+        case 0x1:
+            memOpSize = HALFWORD;
+            break;
+        case 0x2:
+            memOpSize = WORD;
+            break;
+        case 0x4:
+            memOpSize = UPPERBYTE;
+            break;
+        case 0x5:
+            memOpSize = UPPERHALF;
+            break;
+        default:
+            memOpSize = BYTE;
+            break;
+        }
         break;
     case OPIMM:
         regWriteEnable = true;
@@ -360,6 +381,21 @@ bool DecodedInstruction::evaluate()
         immediate_val = (instruction >> 20 & 0xFE0) + (instruction >> 7 & 0x1F);
         memWriteEnable = true;
         aluSrcBIsImm = true;
+        switch (funct3)
+        {
+        case 0x0:
+            memOpSize = BYTE;
+            break;
+        case 0x1:
+            memOpSize = HALFWORD;
+            break;
+        case 0x2:
+            memOpSize = WORD;
+            break;
+        default:
+            memOpSize = BYTE;
+            break;
+        }
         break;
     case OP:
         regWriteEnable = true;

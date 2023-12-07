@@ -23,6 +23,13 @@
 #define SYSTEM  0x73
 
 class riscV;
+enum MemReadWriteSize {
+    BYTE,
+    HALFWORD,
+    WORD,
+    UPPERBYTE,
+    UPPERHALF
+}
 class PC : public IDependencyNode
 {
 private:
@@ -60,6 +67,7 @@ public:
 
     bool memReadEnable;
     bool memWriteEnable;
+    MemReadWriteSize memOpSize;
     
     uint8_t aluOp;
     bool aluSrcAIsPC;
