@@ -134,7 +134,7 @@ uint16_t UsbReadWordResponse::getPayloadWireSize()
 
 UsbWriteWordRequest::UsbWriteWordRequest(uint32_t addr, uint32_t value, uint16_t PktCnt)
     : UsbPacket(USB_CMD_WRITE_WORD_REQUEST),
-      Address(Address),
+      Address(addr),
       Value(value),
       PktCnt(PktCnt) {}
 UsbWriteWordRequest::UsbWriteWordRequest(IQueue *que)

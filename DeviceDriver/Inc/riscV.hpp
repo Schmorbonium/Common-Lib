@@ -1,3 +1,5 @@
+#ifndef __RISCV__
+#define  __RISCV__
 #include "DependencyTree.hpp"
 
 #define LOAD    0x03
@@ -23,13 +25,14 @@
 #define SYSTEM  0x73
 
 class riscV;
+
 enum MemReadWriteSize {
     BYTE,
     HALFWORD,
     WORD,
     UPPERBYTE,
     UPPERHALF
-}
+};
 class PC : public IDependencyNode
 {
 private:
@@ -155,3 +158,5 @@ public:
     riscV();
     ~riscV();
 };
+
+#endif

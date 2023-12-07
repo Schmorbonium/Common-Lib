@@ -304,10 +304,12 @@ bool DecodedInstruction::evaluate()
     switch (opcode)
     {
     case LOAD:
+        regDestMux = 2;
         immediate_val = (instruction >> 20) & 0xFFF;
         regWriteEnable = true;
         aluOp = IBC_ALUOP_ADD;
         memReadEnable = true;
+        aluSrcBIsImm = true;
         switch (funct3)
         {
         case 0x0:
@@ -333,7 +335,7 @@ bool DecodedInstruction::evaluate()
     case OPIMM:
         regWriteEnable = true;
         // determine what ALUOP is on the instruction
-        immediate_val = (((signed)instruction) >> 20) & 0xFFF;
+        immediate_val = (((signed)instruction) >> 20);
         // immediate_val = (instruction >> 20) & 0xFFF;
         aluSrcBIsImm = true;
         switch (funct3)
@@ -437,22 +439,28 @@ bool DecodedInstruction::evaluate()
         break;
     case LUI:
         immediate_val = instruction & 0xFFFFF000;
+        regDestMux = 3;
         regWriteEnable = true;
         aluSrcBIsImm = true;
         break;
     case BRANCH:
         aluOp = IBC_ALUOP_SUB;
         immediate_val = 0x00000000 | (((instruction & 0x80000000) >> 19) | ((instruction & 0x80) << 4) | ((instruction & 0x7E000000) >> 20) | ((instruction & 0xF00) >> 7));
+        immediate_val = ((signed)(immediate_val << 19) >> 19);
         break;
     case JALR:
+        regDestMux = 1;
         immediate_val = 0x00000000 | ((instruction & 0xFFF00000) >> 20);
         aluOp = IBC_ALUOP_ADD;
         aluSrcBIsImm = true;
         jump = true;
         break;
     case JAL:
+        regDestMux = 1;
         jump = true;
-        immediate_val = 0x00000000 | (((instruction & 0x800000000) >> 11) | (instruction & 0xFF000) | ((instruction & 0x100000) >> 9) | ((instruction & 0x7FE00000) >> 20));
+        immediate_val = 0x00000000 | (((instruction & 0x80000000) >> 11) | (instruction & 0xFF000) | ((instruction & 0x100000) >> 9) | ((instruction & 0x7FE00000) >> 20));
+        immediate_val = ((signed)(immediate_val << 11) >> 11);
+
         break;
     case SYSTEM:
         break;
