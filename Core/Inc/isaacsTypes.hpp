@@ -2,9 +2,6 @@
 #ifndef __IsaacTypes_
 #define __IsaacTypes_
 
-
-
-
 #include "zHal.h"
 
 #define HYBRID_NODE_SIZE 16
@@ -22,7 +19,6 @@ class Queue
 {
 
 protected:
-
 public:
     Queue() : head(nullptr), tail(nullptr), size(0)
     {
@@ -34,12 +30,12 @@ public:
     }
 
     // Delete copy constructor and copy assignment operator
-    Queue(const Queue&) = delete;
-    Queue& operator=(const Queue&) = delete;
+    Queue(const Queue &) = delete;
+    Queue &operator=(const Queue &) = delete;
 
     // Delete move constructor and move assignment operator
-    Queue(Queue&&) = delete;
-    Queue& operator=(Queue&&) = delete;
+    Queue(Queue &&) = delete;
+    Queue &operator=(Queue &&) = delete;
 
     void enqueue(T value)
     {
@@ -121,30 +117,37 @@ private:
     uint8_t headIndex;
 };
 
-
 template <typename T>
-class ArrayList {
+class ArrayList
+{
 public:
     ArrayList() : size(0) {}
 
-    bool add(T* item) {
-        if (size < MAX_SIZE) {
+    bool add(T *item)
+    {
+        if (size < MAX_SIZE)
+        {
             array[size++] = item;
             return true;
         }
         return false;
     }
 
-    T* get(size_t index) const {
-        if (index < size) {
+    T *get(size_t index) const
+    {
+        if (index < size)
+        {
             return array[index];
         }
         return nullptr;
     }
 
-    bool remove(size_t index) {
-        if (index < size) {
-            for (size_t i = index; i < size - 1; ++i) {
+    bool remove(size_t index)
+    {
+        if (index < size)
+        {
+            for (size_t i = index; i < size - 1; ++i)
+            {
                 array[i] = array[i + 1];
             }
             size--;
@@ -153,68 +156,86 @@ public:
         return false;
     }
 
-    uint16_t getSize() const {
+    uint16_t getSize() const
+    {
         return size;
     }
 
-    bool isFull() const {
+    bool isFull() const
+    {
         return size == MAX_SIZE;
     }
 
-    bool isEmpty() const {
+    bool isEmpty() const
+    {
         return size == 0;
     }
 
 private:
-    static const size_t MAX_SIZE = 4;
-    T* array[MAX_SIZE];
+    static const size_t MAX_SIZE = 16;
+    T *array[MAX_SIZE];
     uint16_t size;
 };
 
 template <typename T>
-class PriorityQueue {
+class PriorityQueue
+{
 
 private:
-    struct Node {
-        T* data;
-        Node* next;
+    struct Node
+    {
+        T *data;
+        Node *next;
 
-        Node(T* d, Node* n = nullptr) : data(d), next(n) {}
+        Node(T *d, Node *n = nullptr) : data(d), next(n) {}
     };
 
-    Node* head;
+    Node *head;
 
 public:
     PriorityQueue() : head(nullptr) {}
 
-    ~PriorityQueue() {
-        while (head != nullptr) {
-            Node* temp = head;
+    ~PriorityQueue()
+    {
+        while (head != nullptr)
+        {
+            Node *temp = head;
             head = head->next;
             delete temp;
         }
     }
 
-    void enqueue(T* item) {
-        Node** curr = &head;
-        while (*curr != nullptr && (*curr)->data->getPriority() < item->getPriority()) {
-            curr = &(*curr)->next;
+    void enqueue(T *item)
+    {
+        if((head == nullptr )|| (head->data->getPriority() >  item->getPriority())){
+            head = new Node(item, head);
+            return;
         }
-        *curr = new Node(item, *curr);
+
+        Node* current = head;
+        while(current->next != nullptr && current->data->getPriority() <=  item->getPriority()){
+            if(item == current->data){
+                return;
+            }
+            current = current->next;
+        }
+        current->next = new Node(item, current->next);
     }
 
-    T* dequeue() {
-        if (isEmpty()) {
-
+    T *dequeue()
+    {
+        if (isEmpty())
+        {
         }
-        Node* temp = head;
-        T* item = head->data;
+        Node *temp = head;
+        T *item = head->data;
         head = head->next;
         delete temp;
         return item;
     }
 
-    bool isEmpty() const {
+    bool isEmpty() const
+    {
         return head == nullptr;
     }
 };
@@ -267,13 +288,14 @@ public:
 //     }
 // };
 
-
 //  ID Manager
-class IDManager {
+class IDManager
+{
 public:
     IDManager();
     uint16_t allocateID();
     void freeID(uint16_t id);
+
 private:
     int nextID;
     Queue<uint16_t> freedIDs;

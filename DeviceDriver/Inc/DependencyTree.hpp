@@ -17,13 +17,14 @@ class IDependencyNode{
     DependencyTree *parent;
     uint8_t priority;
     ArrayList<IDependencyNode> dependees;
+    void addDependent(IDependencyNode *dependee);
 public:
     virtual bool evaluate();
     IDependencyNode(DependencyTree *parentTree);
     void addDependency(IDependencyNode *dependee);
     uint8_t getPriority();
-protected:
     void appendDependencies();
+protected:
 };
 
 

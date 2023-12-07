@@ -124,7 +124,6 @@ class MemoryOp : public IDependencyNode
 private:
     riscV* processor;
 public:
-    uint32_t programCounter;
     uint32_t dataOut;
     bool evaluate();
     MemoryOp(DependencyTree* parent, riscV* processor);

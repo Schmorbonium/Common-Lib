@@ -1,15 +1,22 @@
 #include "riscV.hpp"
 #include "ibc.h"
+#include "memClient.hpp"
+#include "MemIoLEDs.hpp"
 
-riscV::riscV() : process(),
-pc(&process, this),
-instruction(&process, this),
-decodedInstruction(&process, this),
-registerOut(&process, this),
-alu(&process, this),
-newPC(&process, this),
-memOp(&process, this),
-regWrite(&process, this) {
+extern MemoryClient *mainMem;
+
+riscV::riscV()
+    : process(),
+      pc(&process, this),
+      instruction(&process, this),
+      decodedInstruction(&process, this),
+      registerOut(&process, this),
+      alu(&process, this),
+      newPC(&process, this),
+      memOp(&process, this),
+      regWrite(&process, this)
+{
+
     instruction.addDependency(&pc);
     decodedInstruction.addDependency(&instruction);
     registerOut.addDependency(&decodedInstruction);
@@ -26,36 +33,69 @@ regWrite(&process, this) {
     regWrite.addDependency(&memOp);
 }
 
-riscV::~riscV() {
+riscV::~riscV()
+{
 }
 
 /*****************************************
  * MemoryOp Node
  * Isaac
  *****************************************/
-MemoryOp::MemoryOp(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+MemoryOp::MemoryOp(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
 }
 
-bool MemoryOp::evaluate() {
-    return false;
+MemoryOp::~MemoryOp()
+{
+}
+
+bool MemoryOp::evaluate()
+{
+    uint32_t targetAddr = processor->alu.output;
+    uint32_t ProposedWrite = processor->registerOut.regB_value;
+
+    if (processor->decodedInstruction.memReadEnable)
+    {
+        this->dataOut = mainMem->read(targetAddr);
+    }
+    else
+    {
+        dataOut = 0;
+    }
+
+    if (processor->decodedInstruction.memWriteEnable)
+    {
+        mainMem->write(targetAddr, ProposedWrite);
+    }
+
+    return true;
 }
 
 /*****************************************
  * RegisterWrite
  * Daniel
  *****************************************/
-RegisterWrite::RegisterWrite(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+RegisterWrite::RegisterWrite(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++)
+    {
         regs[i] = 0;
     }
 }
 
-bool RegisterWrite::evaluate() {
-    if (processor->decodedInstruction.regWriteEnable) {
-        switch (processor->decodedInstruction.regDestMux) {
-        case 0: //output
+RegisterWrite::~RegisterWrite()
+{
+}
+
+bool RegisterWrite::evaluate()
+{
+    if (processor->decodedInstruction.regWriteEnable)
+    {
+        switch (processor->decodedInstruction.regDestMux)
+        {
+        case 0: // output
             regs[processor->decodedInstruction.regDest_select] = processor->alu.output;
             break;
         case 1: // pc+4
@@ -70,17 +110,22 @@ bool RegisterWrite::evaluate() {
         }
         return true;
     }
-    return false;
+    return true;
 }
 
 /*****************************************
  * NewPC
  * Alex
  *****************************************/
-NewPC::NewPC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+NewPC::NewPC(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
+    pcPlus4 = 0;
+    programCounter = 0;
 }
-
+NewPC::~NewPC()
+{
+}
 
 bool NewPC::evaluate()
 {
@@ -90,7 +135,7 @@ bool NewPC::evaluate()
     {
         switch (processor->decodedInstruction.funct3)
         {
-        case 0x0: // BEQ
+        case 0x0:                           // BEQ
             if (processor->alu.output == 0) // branch true
                 programCounter = processor->pc.programCounter + processor->decodedInstruction.immediate_val;
             break;
@@ -122,34 +167,47 @@ bool NewPC::evaluate()
         programCounter = (processor->pc.programCounter + processor->decodedInstruction.immediate_val) & 0xFFFFFFFE;
     else
         ;
-    return true;
 
+    return true;
 }
 
 /*****************************************
  * ALUOut
  * Daniel
  *****************************************/
-ALUOut::ALUOut(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+ALUOut::ALUOut(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
 }
 
-bool ALUOut::evaluate() {
+ALUOut::~ALUOut()
+{
+}
+
+bool ALUOut::evaluate()
+{
     uint32_t leftOperand;
     uint32_t rightOperand;
 
-    if (processor->decodedInstruction.aluSrcAIsPC) {
+    if (processor->decodedInstruction.aluSrcAIsPC)
+    {
         leftOperand = processor->pc.programCounter;
-    } else {
+    }
+    else
+    {
         leftOperand = processor->registerOut.regA_value;
     }
 
-    if (processor->decodedInstruction.aluSrcBIsImm) {
+    if (processor->decodedInstruction.aluSrcBIsImm)
+    {
         rightOperand = processor->decodedInstruction.immediate_val;
-    } else {
+    }
+    else
+    {
         rightOperand = processor->registerOut.regB_value;
     }
-    switch (processor->decodedInstruction.aluOp) {
+    switch (processor->decodedInstruction.aluOp)
+    {
     case IBC_ALUOP_ADD:
         output = leftOperand + rightOperand;
         break;
@@ -181,7 +239,7 @@ bool ALUOut::evaluate() {
         output = (int32_t)leftOperand >> (int32_t)rightOperand;
         break;
     default:
-        //TODO: best behavior for unknown ALUop code
+        // TODO: best behavior for unknown ALUop code
         break;
     }
 
@@ -192,13 +250,20 @@ bool ALUOut::evaluate() {
  * RegisterOutputs
  * Daniel
  *****************************************/
-RegisterOutputs::RegisterOutputs(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+RegisterOutputs::RegisterOutputs(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
 }
 
-bool RegisterOutputs::evaluate() {
+RegisterOutputs::~RegisterOutputs()
+{
+}
+
+bool RegisterOutputs::evaluate()
+{
     regA_value = processor->regWrite.regs[processor->decodedInstruction.regA_select];
     regB_value = processor->regWrite.regs[processor->decodedInstruction.regB_select];
+
     return true;
 }
 
@@ -206,8 +271,13 @@ bool RegisterOutputs::evaluate() {
  * DecodedInstruction
  * Alex
  *****************************************/
-DecodedInstruction::DecodedInstruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+DecodedInstruction::DecodedInstruction(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
+}
+
+DecodedInstruction::~DecodedInstruction()
+{
 }
 
 bool DecodedInstruction::evaluate()
@@ -242,18 +312,13 @@ bool DecodedInstruction::evaluate()
     case OPIMM:
         regWriteEnable = true;
         // determine what ALUOP is on the instruction
+        immediate_val = (((signed)instruction) >> 20) & 0xFFF;
+        // immediate_val = (instruction >> 20) & 0xFFF;
         aluSrcBIsImm = true;
         switch (funct3)
         {
         case 0x0: // ADD or SUB
-            if (funct7 > 0)
-            {
-                aluOp = IBC_ALUOP_SUB;
-            }
-            else
-            {
-                aluOp = IBC_ALUOP_ADD;
-            }
+            aluOp = IBC_ALUOP_ADD;
             break;
         case 0x1: // SLL
             aluOp = IBC_ALUOP_SLL;
@@ -262,13 +327,14 @@ bool DecodedInstruction::evaluate()
             aluOp = IBC_ALUOP_SLT;
             break;
         case 0x3: // SLTU
+            immediate_val = ((instruction) >> 20) & 0xFFF;
             aluOp = IBC_ALUOP_SLTU;
             break;
         case 0x4: // XOR
             aluOp = IBC_ALUOP_XOR;
             break;
         case 0x5: // SRL or SRA
-            if (funct7 > 0)
+            if (funct7)
                 aluOp = IBC_ALUOP_SRA;
             else
                 aluOp = IBC_ALUOP_SRL;
@@ -300,7 +366,7 @@ bool DecodedInstruction::evaluate()
         switch (funct3)
         {
         case 0x0: // ADD or SUB
-            if (funct7 > 0)
+            if (funct7)
                 aluOp = IBC_ALUOP_SUB;
             else
                 aluOp = IBC_ALUOP_ADD;
@@ -318,7 +384,7 @@ bool DecodedInstruction::evaluate()
             aluOp = IBC_ALUOP_XOR;
             break;
         case 0x5: // SRL or SRA
-            if (funct7 > 0)
+            if (funct7)
                 aluOp = IBC_ALUOP_SRA;
             else
                 aluOp = IBC_ALUOP_SRL;
@@ -364,25 +430,37 @@ bool DecodedInstruction::evaluate()
  * Instruction
  * Isaac
  *****************************************/
-Instruction::Instruction(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+Instruction::Instruction(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
 }
 
-bool Instruction::evaluate() {
-    return false;
+Instruction::~Instruction()
+{
+}
+
+bool Instruction::evaluate()
+{
+    this->instruction = mainMem->read(processor->pc.programCounter);
+    return true;
 }
 
 /*****************************************
  * PC
  * Alex
  *****************************************/
-PC::PC(DependencyTree* parent, riscV* processor) : IDependencyNode(parent) {
+PC::PC(DependencyTree *parent, riscV *processor) : IDependencyNode(parent)
+{
     this->processor = processor;
+    this->programCounter = 0;
+}
+
+PC::~PC()
+{
 }
 
 bool PC::evaluate()
 {
     this->programCounter = processor->newPC.programCounter;
     return true;
-
 }

@@ -11,6 +11,9 @@ void DependencyTree::resolve()
     {
         IDependencyNode *node = queue.dequeue();
         node->evaluate();
+        node->appendDependencies();
+        // if(node->evaluate()){
+        // }
     }
 }
 
@@ -19,17 +22,32 @@ void DependencyTree::resolve()
  **********************************************/
 IDependencyNode::IDependencyNode(DependencyTree *parentTree)
 {
+    this->priority = 0;
     parent = parentTree;
+}
+
+void IDependencyNode::addDependent(IDependencyNode *dependee)
+{
+    dependees.add(dependee);
 }
 
 void IDependencyNode::addDependency(IDependencyNode *dependee)
 {
-    dependees.add(dependee);
+    dependee->addDependent(this);
+    if (dependee->priority >= this->priority)
+    {
+        this->priority = dependee->priority + 1;
+    }
 }
 
 uint8_t IDependencyNode::getPriority()
 {
     return priority;
+}
+
+bool IDependencyNode::evaluate()
+{
+    return false;
 }
 
 void IDependencyNode::appendDependencies()
