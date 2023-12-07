@@ -90,27 +90,11 @@ class UsbWriteWordRequest : public UsbPacket
     Uint16Field PktCnt;
 
 public:
-    UsbWriteWordRequest(uint32_t addr, uint32_t value, uint16_t PktCnt)
-        : UsbPacket(USB_CMD_WRITE_WORD_REQUEST),
-          Address(Address),
-          Value(value),
-          PktCnt(PktCnt) {}
-    UsbWriteWordRequest(IQueue *que)
-        : UsbPacket(que),
-          Address(que),
-          Value(que),
-          PktCnt(que) {}
+    UsbWriteWordRequest(uint32_t addr, uint32_t value, uint16_t PktCnt);
+    UsbWriteWordRequest(IQueue *que);
     ~UsbWriteWordRequest();
-    virtual void appendPayload(IQueue *que)
-    {
-        Address.appendToQue(que);
-        Value.appendToQue(que);
-        PktCnt.appendToQue(que);
-    }
-    virtual uint16_t getPayloadWireSize()
-    {
-        return Address.getWireSize() + Value.getWireSize() + PktCnt.getWireSize();
-    }
+    virtual void appendPayload(IQueue *que);
+    virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
 
@@ -120,28 +104,11 @@ class UsbWriteWordResponse : public UsbPacket
     Uint16Field PktCnt;
 
 public:
-    UsbWriteWordResponse(uint32_t addr, uint16_t PktCnt)
-    : UsbPacket(USN_CMD_WRITE_WORD_RESPONSE),
-    Address(addr),
-    PktCnt(PktCnt)
-    {
-
-    }
-    UsbWriteWordResponse(IQueue *que)
-    : UsbPacket(que),
-    Address(que),
-    PktCnt(que)
-    {
-
-    }
-    ~UsbWriteWordResponse(){}
-    virtual void appendPayload(IQueue *que){
-        Address.appendToQue(que);
-        PktCnt.appendToQue(que);
-    }
-    virtual uint16_t getPayloadWireSize(){
-        return Address.getWireSize() + PktCnt.getWireSize();
-    }
+    UsbWriteWordResponse(uint32_t addr, uint16_t PktCnt);
+    UsbWriteWordResponse(IQueue *que);
+    ~UsbWriteWordResponse();
+    virtual void appendPayload(IQueue *que);
+    virtual uint16_t getPayloadWireSize();
     virtual bool actOnPkt();
 };
 
