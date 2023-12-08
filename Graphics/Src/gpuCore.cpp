@@ -47,7 +47,7 @@ uint16_t GPUPacket::getPayloadWireSize() { return 0; }
 bool GPUPacket::actOnPkt() { return false; };
 
 ResponseGPUPkt::ResponseGPUPkt(uint16_t cmdCnt)
-    : GPUPacket(GPU_RESET_PKT_ENUM),
+    : GPUPacket(GPU_RESPONSE),
       cmdCnt(cmdCnt)
 {
 }
@@ -74,8 +74,16 @@ ResetGPUPkt::ResetGPUPkt(IQueue *que)
 {
 }
 ResetGPUPkt::~ResetGPUPkt() {}
-void ResetGPUPkt::appendPayload(IQueue *que) { resetPhase.appendToQue(que); }
-uint16_t ResetGPUPkt::getPayloadWireSize() { return resetPhase.getWireSize() + pktCnt.getWireSize(); }
+void ResetGPUPkt::appendPayload(IQueue *que)
+{
+    pktCnt.appendToQue(que);
+    resetPhase.appendToQue(que);
+}
+uint16_t ResetGPUPkt::getPayloadWireSize()
+{
+    return resetPhase.getWireSize() +
+           pktCnt.getWireSize();
+}
 
 SetBackground::SetBackground(uint16_t pktCnt, Color color)
     : GPUPacket(GPU_SET_BACKGROUND),
@@ -208,11 +216,6 @@ GPUPacket *GPU_Channel::getNextPacket()
 }
 
 GPU_Channel::GPU_Channel(IBufferedChannel *Core) : Uart_Channel(Core) {}
-
-
-
-
-
 
 // To Implement in the Client and server respetivly
 // bool ResetGPUPkt::actOnPkt();

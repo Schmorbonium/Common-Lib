@@ -72,7 +72,7 @@ public:
     virtual ~GPUPacket() {}
     virtual void appendPayload(IQueue *que) { return; }
     virtual uint16_t getPayloadWireSize() { return 0; }
-    virtual bool actOnPkt(){};
+    virtual bool actOnPkt(){return true;};
 };
 
 class ResponseGPUPkt : public GPUPacket
@@ -93,7 +93,7 @@ public:
     ~ResponseGPUPkt() {}
     virtual void appendPayload(IQueue *que) { cmdCnt.appendToQue(que); }
     virtual uint16_t getPayloadWireSize() { return cmdCnt.getWireSize(); }
-    virtual bool actOnPkt() {}
+    virtual bool actOnPkt() {return true;}
 };
 
 // This Packet triggers a reset
