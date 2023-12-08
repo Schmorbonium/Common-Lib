@@ -45,10 +45,10 @@ public:
 
 class ResponseGPUPkt : public GPUPacket
 {
-    Uint8Field cmdCnt;
+    Uint16Field cmdCnt;
 
 public:
-    ResponseGPUPkt(uint8_t cmdCnt);
+    ResponseGPUPkt(uint16_t cmdCnt);
     ResponseGPUPkt(IQueue *que);
     ~ResponseGPUPkt();
     virtual void appendPayload(IQueue *que);

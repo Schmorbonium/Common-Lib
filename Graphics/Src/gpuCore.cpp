@@ -46,7 +46,7 @@ void GPUPacket::appendPayload(IQueue *que) { return; }
 uint16_t GPUPacket::getPayloadWireSize() { return 0; }
 bool GPUPacket::actOnPkt() { return false; };
 
-ResponseGPUPkt::ResponseGPUPkt(uint8_t cmdCnt)
+ResponseGPUPkt::ResponseGPUPkt(uint16_t cmdCnt)
     : GPUPacket(GPU_RESET_PKT_ENUM),
       cmdCnt(cmdCnt)
 {
