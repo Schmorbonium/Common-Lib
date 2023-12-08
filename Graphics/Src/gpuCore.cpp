@@ -1,110 +1,222 @@
-// There will need to be serval GPU related commands to send over the wire.
-
-// STATUS   RESET_GPU()
-// FRAME_ID NEW_FRAME(W,H) Allocate a new section of memory for a image.
-// LUT_ID   NEW_LUT() Allocates a new section of memory for a Look Up Table.
-// SPRITE_ID NEW_SPRITE(W,H,FRAME_COUNT) Creates a new SPRITE with given Width Height, and frame depth. (should allow for animation for us nerds)
-
-// Status   LOAD_FRAME(FRAME_ID,frameDate)
-// Status   LOAD_LUT(LUT_ID,LUT_Data)
-
-// STATUS   LINK_FRAME(SPRITE_ID,FRAME_ID)
-// STATUS   LINK_MULTI_FRAME(SPRITE_ID,FRAME_ID,uint8_t SPRITE_FRAME_INDEX)
-
-// STATUS   PLACE_SPRITE(X,Y)
-// STATUS   ANIMATE_SPRITE(SPRITE_ID,AnimationRate) Sets the Sprite to automatically cycle though images. rate is a clock divider so higher is slower
 #include "gpuCore.hpp"
-#include "bufferedUart.hpp"
-#include "iQueue.hpp"
-#include "uartData.hpp"
 
-// ------------------------------------- Generic packet stuff -------------------------------------
-// Cmd_FrameID = 0x1,
-FrameIdPkt::FrameIdPkt(uint16_t _FrameId) : GPU_Packet(Cmd_FrameID), FrameId(_FrameId) {}
-FrameIdPkt::FrameIdPkt(IQueue *que) : GPU_Packet(que), FrameId(que) {}
-FrameIdPkt::~FrameIdPkt() {}
-void FrameIdPkt::appendPayload(IQueue *que) { FrameId.appendToQue(que); }
-uint16_t FrameIdPkt::getPayloadWireSize() { return FrameId.getWireSize(); }
-
-// Cmd_LutID,
-// Cmd_SpriteID,
-// Cmd_NewFrame,
-// Cmd_NewLut,
-// Cmd_NewSprite,
-// Cmd_LinkFrame,
-// Cmd_LinkMultiFrame,
-// Cmd_PlaceSprite,
-// Cmd_AnimateSprite,
-// Cmd_MoveSprite,
-// Cmd_LoadFrame,
-// Cmd_LoadLut,
-// Cmd_NewShape,
-NewShapePkt::NewShapePkt(ShapeObj shapeData)
-    : GPU_Packet(Cmd_NewShape),
-      shapeData(shapeData) {}
-NewShapePkt::NewShapePkt(IQueue *que)
-    : GPU_Packet(que),
-      shapeData(que) {}
-NewShapePkt::~NewShapePkt() {}
-
-void NewShapePkt::appendPayload(IQueue *que)
-{
-    shapeData.appendToQue(que);
-}
-uint16_t NewShapePkt::getPayloadWireSize() { return shapeData.getWireSize(); }
-
-// Cmd_SetShape,
-SetShapePkt::SetShapePkt(uint16_t ShapeId, ShapeObj shapeData)
-    : GPU_Packet(Cmd_SetShape),
-      shapeData(shapeData) {}
-SetShapePkt::SetShapePkt(IQueue *que)
-    : GPU_Packet(que),
-      shapeData(que) {}
-SetShapePkt::~SetShapePkt() {}
-void SetShapePkt::appendPayload(IQueue *que) {}
-uint16_t SetShapePkt::getPayloadWireSize() { return shapeData.getWireSize(); }
-// Cmd_MoveShape,
-MoveShapePkt::MoveShapePkt(uint16_t LutId)
-    : GPU_Packet(Cmd_SetShape) {}
-MoveShapePkt::MoveShapePkt(IQueue *que)
-    : GPU_Packet(que) {}
-MoveShapePkt::~MoveShapePkt() {}
-void MoveShapePkt::appendPayload(IQueue *que) {}
-uint16_t MoveShapePkt::getPayloadWireSize() { return 0; }
-
-FillBackGroundPkt::FillBackGroundPkt(Color color) : GPU_Packet(Cmd_FillBackGround), fillColor(color) {}
-FillBackGroundPkt::FillBackGroundPkt(IQueue *que) : GPU_Packet(que), fillColor(que) {}
-FillBackGroundPkt::~FillBackGroundPkt() {}
-void FillBackGroundPkt::appendPayload(IQueue *que)
-{
-    fillColor.appendToQue(que);
-}
-uint16_t FillBackGroundPkt::getPayloadWireSize()
-{
-    return fillColor.getWireSize();
-}
-
-// Cmd_ResetGpu = 0xA5A5
-GpuResetPkt::GpuResetPkt(ResetType_Enum ResetType) : GPU_Packet(Cmd_ResetGpu), ResetType(ResetType) {}
-GpuResetPkt::GpuResetPkt(IQueue *que) : GPU_Packet(que), ResetType(que) {}
-GpuResetPkt::~GpuResetPkt() {}
-void GpuResetPkt::appendPayload(IQueue *que) { ResetType.appendToQue(que); }
-uint16_t GpuResetPkt::getPayloadWireSize() { return ResetType.getWireSize(); }
-
-// ------------------------------------- GPU Channel -------------------------------------
-GPU_Channel::GPU_Channel(UART_HandleTypeDef *Core) : Uart_Channel(new BufferedUart(Core))
+ColorFeild::ColorFeild(Color color)
+    : r(color.R),
+      g(color.G),
+      b(color.B)
 {
 }
-
-GPU_Packet *GPU_Channel::getNextPacket()
+ColorFeild::ColorFeild(IQueue *que)
+    : r(que),
+      g(que),
+      b(que)
 {
-    IQueue *inputQue = &channel->RxQue;
-    switch (this->peekCommand())
+}
+void ColorFeild::parseFromQue(IQueue *que)
+{
+    r.parseFromQue(que);
+    g.parseFromQue(que);
+    b.parseFromQue(que);
+}
+void ColorFeild::appendToQue(IQueue *que)
+{
+    r.appendToQue(que);
+    g.appendToQue(que);
+    b.appendToQue(que);
+}
+uint16_t ColorFeild::getWireSize()
+{
+    return r.getWireSize() +
+           g.getWireSize() +
+           b.getWireSize();
+}
+Color ColorFeild::getColor()
+{
+    Color c;
+    c.R = this->r.data;
+    c.G = this->g.data;
+    c.B = this->b.data;
+    return c;
+}
+
+GPUPacket::GPUPacket(GPU_Pkt_Command command) : Uart_Packet(command) {}
+GPUPacket::GPUPacket(IQueue *que) : Uart_Packet(que) {}
+GPUPacket::~GPUPacket() {}
+void GPUPacket::appendPayload(IQueue *que) { return; }
+uint16_t GPUPacket::getPayloadWireSize() { return 0; }
+bool GPUPacket::actOnPkt() { return false; };
+
+ResponseGPUPkt::ResponseGPUPkt(uint8_t cmdCnt)
+    : GPUPacket(GPU_RESET_PKT_ENUM),
+      cmdCnt(cmdCnt)
+{
+}
+ResponseGPUPkt::ResponseGPUPkt(IQueue *que)
+    : GPUPacket(que),
+      cmdCnt(que)
+{
+}
+ResponseGPUPkt::~ResponseGPUPkt() {}
+void ResponseGPUPkt::appendPayload(IQueue *que) { cmdCnt.appendToQue(que); }
+uint16_t ResponseGPUPkt::getPayloadWireSize() { return cmdCnt.getWireSize(); }
+
+// This Packet triggers a reset
+ResetGPUPkt::ResetGPUPkt(uint8_t pktCnt, uint8_t resetPhase)
+    : GPUPacket(GPU_RESET_PKT_ENUM),
+      pktCnt(pktCnt),
+      resetPhase(resetPhase)
+{
+}
+ResetGPUPkt::ResetGPUPkt(IQueue *que)
+    : GPUPacket(que),
+      pktCnt(que),
+      resetPhase(que)
+{
+}
+ResetGPUPkt::~ResetGPUPkt() {}
+void ResetGPUPkt::appendPayload(IQueue *que) { resetPhase.appendToQue(que); }
+uint16_t ResetGPUPkt::getPayloadWireSize() { return resetPhase.getWireSize() + pktCnt.getWireSize(); }
+
+SetBackground::SetBackground(uint16_t pktCnt, Color color)
+    : GPUPacket(GPU_SET_BACKGROUND),
+      pktCnt(pktCnt),
+      setColor(color)
+{
+}
+SetBackground::SetBackground(IQueue *que)
+    : GPUPacket(que),
+      pktCnt(que),
+      setColor(que)
+{
+}
+SetBackground::~SetBackground() {}
+void SetBackground::appendPayload(IQueue *que)
+{
+    pktCnt.appendToQue(que);
+    setColor.appendToQue(que);
+}
+uint16_t SetBackground::getPayloadWireSize()
+{
+    return pktCnt.getWireSize() +
+           setColor.getWireSize();
+}
+
+DrawRectPkt::DrawRectPkt(uint16_t pktCnt, BoundingBox_t box, uint16_t fillType, Color fillColor)
+    : GPUPacket(GPU_PLACE_RECTANGLE),
+      pktCnt(pktCnt),
+      x(box.x),
+      y(box.y),
+      h(box.h),
+      w(box.w),
+      fillEnum(fillType),
+      setColor(fillColor)
+{
+}
+DrawRectPkt::DrawRectPkt(IQueue *que)
+    : GPUPacket(que),
+      pktCnt(que),
+      x(que),
+      y(que),
+      h(que),
+      w(que),
+      fillEnum(que),
+      setColor(que)
+{
+}
+DrawRectPkt::~DrawRectPkt() {}
+void DrawRectPkt::appendPayload(IQueue *que)
+{
+    pktCnt.appendToQue(que);
+    x.appendToQue(que);
+    y.appendToQue(que);
+    h.appendToQue(que);
+    w.appendToQue(que);
+    fillEnum.appendToQue(que);
+    setColor.appendToQue(que);
+}
+uint16_t DrawRectPkt::getPayloadWireSize()
+{
+    return pktCnt.getWireSize() +
+           x.getWireSize() +
+           y.getWireSize() +
+           h.getWireSize() +
+           w.getWireSize() +
+           fillEnum.getWireSize() +
+           setColor.getWireSize();
+}
+
+DrawStrPkt::DrawStrPkt(uint16_t pktCnt, uint16_t x, uint16_t y, Color c, char *string, uint16_t strLeng)
+    : GPUPacket(GPU_PLACE_TEXT),
+      pktCnt(pktCnt),
+      x(x),
+      y(y),
+      color(c),
+      str(string, strLeng)
+{
+}
+
+DrawStrPkt::DrawStrPkt(IQueue *que)
+    : GPUPacket(que),
+      pktCnt(que),
+      x(que),
+      y(que),
+      color(que),
+      str(que) {}
+DrawStrPkt::~DrawStrPkt() {}
+void DrawStrPkt::appendPayload(IQueue *que)
+{
+    pktCnt.appendToQue(que);
+    x.appendToQue(que);
+    y.appendToQue(que);
+    color.appendToQue(que);
+    str.appendToQue(que);
+}
+uint16_t DrawStrPkt::getPayloadWireSize()
+{
+    return pktCnt.getWireSize() +
+           x.getWireSize() +
+           y.getWireSize() +
+           color.getWireSize() +
+           str.getWireSize();
+}
+
+GPUPacket *GPU_Channel::getNextPacket()
+{
+    GPU_Pkt_Command cmd = (GPU_Pkt_Command)this->peekCommand();
+    switch (cmd)
     {
-    case Cmd_FillBackGround:
-        return new FillBackGroundPkt(inputQue);
+    case GPU_RESET_PKT_ENUM:
+        return new ResetGPUPkt(&this->channel->RxQue);
+        break;
+    case GPU_SET_BACKGROUND:
+        return new SetBackground(&this->channel->RxQue);
+        break;
+    case GPU_PLACE_RECTANGLE:
+        return new DrawRectPkt(&this->channel->RxQue);
+        break;
+    case GPU_PLACE_TEXT:
+        return new DrawStrPkt(&this->channel->RxQue);
+        break;
+    case GPU_RESPONSE:
+        return new ResponseGPUPkt(&this->channel->RxQue);
+        break;
     default:
         break;
     }
-    return new GPU_Packet(&channel->RxQue);
+
+    return new GPUPacket(&this->channel->RxQue);
 }
+
+GPU_Channel::GPU_Channel(IBufferedChannel *Core) : Uart_Channel(Core) {}
+
+
+
+
+
+
+// To Implement in the Client and server respetivly
+// bool ResetGPUPkt::actOnPkt();
+// bool SetBackground::actOnPkt();
+// bool DrawRectPkt::actOnPkt();
+// bool DrawStrPkt::actOnPkt();
+// bool ResponseGPUPkt::actOnPkt();
