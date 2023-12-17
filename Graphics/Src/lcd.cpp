@@ -193,7 +193,7 @@ void LCD_Controller::initLcd()
     HWReset();
     SWReset();
     BackLightEnable();
-    LCD_Dir(down);
+    LCD_Dir(up);
 }
 
 void LCD_Controller::BackLightEnable()

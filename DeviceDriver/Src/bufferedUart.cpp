@@ -1,5 +1,7 @@
 #include "bufferedUart.hpp"
 
+
+volatile bool helpMe;
 BufferedUart::BufferedUart(UART_HandleTypeDef *Core) : listening(false),
                                                        uart(Core)
 {
@@ -33,7 +35,7 @@ void BufferedUart::asyncHandler()
         RxQue.append(data);
     }
 
-    if (_ZHAL_UART_TX_READY(uart->Instance))
+    while (_ZHAL_UART_TX_READY(uart->Instance) && sending)
     {
         if (TxQue.getSize() > 0)
         {
@@ -43,5 +45,9 @@ void BufferedUart::asyncHandler()
         {
             stopSending();
         }
+    }
+
+    if((!_ZHAL_UART_TX_READY(uart->Instance))&&(_ZHAL_UART_RX_READY(uart->Instance))){
+        helpMe = !helpMe;
     }
 }

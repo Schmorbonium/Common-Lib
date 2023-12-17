@@ -5,7 +5,7 @@
 #include "iQueue.hpp"
 #include "ringCharBuffer.hpp"
 
-class IBufferedChannel
+class  IBufferedChannel
 {
 protected:
     virtual void startSending();

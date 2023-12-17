@@ -94,6 +94,7 @@ private:
     void SWReset();
 
 public:
+    Color backgroundColor;
     void DisOn();
     void DisOff();
 
